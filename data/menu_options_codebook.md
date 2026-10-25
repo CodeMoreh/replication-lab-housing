@@ -13,7 +13,7 @@ Three parts of the course read it. The decision map (`cases/housing/map.qmd`) bu
 | `option` | The option code, as the curve, the deviation file and the helpers write it |
 | `label` | A short label for the option, used on the decision map, in the tables of the menu and in messages |
 | `on_curve` | `TRUE` for an option that the curve of 64 keeps (18 rows), `FALSE` for one that the course teaches off the curve (15 rows) |
-| `taught_on` | The page that teaches the option, as a path from the project root. Three values are the paths of the matching pages of the EU-frames course, `exercise/spec-menu.qmd`, `results.qmd` and `case/index.qmd`, which the decision map reads as `cases/housing/menu.qmd`, `cases/housing/multiverse.qmd` and `cases/housing/index.qmd`; the other two, `companion/experiments.qmd` and `companion/binary-outcomes.qmd`, are paths of this site |
+| `taught_on` | The page that teaches the option, as a path from the project root: `cases/housing/index.qmd`, `cases/housing/menu.qmd`, `cases/housing/multiverse.qmd`, `companion/experiments.qmd` or `companion/binary-outcomes.qmd`. A page in `cases/housing/` links to it two levels up |
 | `reason` | One sentence on why the option is or is not on the curve, used by the helpers in their messages and by the verdict of the decision map |
 | `decision` | The name of the decision, as the decision map and the menu print it |
 | `stage` | The stage of the decision map at which the decision is made: `data` (the emails counted, the names, who replied, the bounced emails), `outcome` (the outcome and the replies without a greeting code), `comparison`, `model` (the model and the adjustment) or `inference` (the test and the effect scale) |
