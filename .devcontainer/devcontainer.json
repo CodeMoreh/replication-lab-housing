@@ -1,0 +1,18 @@
+{
+  "name": "replication-lab-housing (R + Quarto)",
+  "image": "ghcr.io/rocker-org/devcontainer/r-ver:4",
+  "features": {
+    "ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {
+      "version": "1.9.36"
+    }
+  },
+  "postCreateCommand": "Rscript -e \"install.packages('pak', repos='https://packagemanager.posit.co/cran/__linux__/jammy/latest'); pak::pak(c('dplyr','purrr','readr','ggplot2','dagitty','rmarkdown'))\"",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "quarto.quarto",
+        "REditorSupport.r"
+      ]
+    }
+  }
+}

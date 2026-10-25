@@ -1,0 +1,24 @@
+project:
+  type: website
+  output-dir: _site
+  # The report is the only page. The codebooks in data/ stay Markdown files,
+  # read as they are; some of them link to codebooks of the course site.
+  render:
+    - index.qmd
+
+website:
+  title: "Replication lab – the housing-audit case"
+
+# freeze: auto means a whole-project render re-runs a document (every chunk in it)
+# only when its source file has changed. The committed _freeze/ folder lets
+# GitHub Actions publish without re-executing everything – but a fresh edit to
+# any chunk DOES re-run on the next render, so your work always shows up.
+execute:
+  freeze: auto
+
+format:
+  html:
+    toc: true
+    theme: cosmo
+    code-fold: false
+    code-tools: true

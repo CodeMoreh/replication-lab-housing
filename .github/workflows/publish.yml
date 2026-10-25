@@ -1,0 +1,77 @@
+# Render the report with Quarto and publish it to GitHub Pages.
+#
+# One-time setup by you: repository Settings -> Pages -> Source: "GitHub Actions".
+# After that, every push to main rebuilds the site and your report appears at
+# https://<your-username>.github.io/replication-lab-housing/
+#
+# Why this installs R (unlike a freeze-only workflow): you will edit the code
+# chunks, so CI must be able to RE-RUN them. We install R + the package list,
+# then let Quarto render. freeze: auto still skips documents whose source is unchanged,
+# so renders stay quick.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+name: Publish
+
+# Permissions the Pages deployment needs.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; let an in-progress run finish.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: "1.9.36"
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.6.0"
+          use-public-rspm: true
+
+      - name: Install R package dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          # No DESCRIPTION file in this template, so list the packages explicitly.
+          packages: >
+            dplyr, purrr, readr, ggplot2, dagitty, rmarkdown
+
+      - name: Render the Quarto site
+        uses: quarto-dev/quarto-actions/render@v2
+        with:
+          path: .
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the rendered site as a Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

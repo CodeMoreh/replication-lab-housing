@@ -1,0 +1,28 @@
+# Codebook: `audit_original.csv`
+
+The public file of the original authors (OAs) of "Does Race Affect Access to Government Services? An Experiment Exploring Street-Level Bureaucrats and Access to Public Housing" (*American Journal of Political Science* 61 (1), 2017), as a plain CSV with its own column names: 1,014 rows, one per email, and 14 columns. It is written by `R/housing/01_audit_data.R` from `HousingAuditAJPSFinalPublic_Unidentified.dta`, the blinded file of the replication package on the Harvard Dataverse (doi:10.7910/DVN/1HOVTU, CC0). The script turns the Stata value labels into their numeric codes and drops the variable labels and formats; it changes no value and no row. The reproduction of Task 3 runs on this file, because a reproduction starts from the data as the OAs published them. Every other exercise uses the course file, `housing_audit.csv` ([codebook](housing_audit_codebook.md)), which holds the same rows in the same order with readable names.
+
+## Columns
+
+| Column | Description | In the course file |
+|:--|:--|:--|
+| `NumberAssignment` | The email account, assigned at random: 1 Tyrone, 2 Shanice, 3 Santiago, 4 Gabriela, 5 Brett, 6 Emily | `name`, `group`, `name_sex` |
+| `TreatmentGroup` | The same assignment as text: `white male`, `white female`, `black male`, `black female`, `Hispanic male`, `Hispanic female`. The codebook of the OAs calls it redundant with `NumberAssignment` | – |
+| `Response_Dichotomous` | 1 if the email received a reply, 0 if not; empty if the email bounced | `reply` |
+| `WaitListFinal` | Replies only: the wait time in months that the reply gave, or a brief description such as `Closed`; empty where the reply gave none | `waitlist` |
+| `ProperName` | Replies only: 1 if the reply began with any named greeting, 0 if not; empty for five replies without a code | `named` |
+| `Respond24` | Replies only: 1 if the reply came within 24 hours, 0 if later | `reply24` |
+| `HardEmail` | 1 if the address came from the list of housing authorities kept by the Department of Housing and Urban Development (HUD), because the authority offered no contact that could be found quickly; 0 otherwise | `hard_email` |
+| `HispanicEmailer` | Replies only: 1 if the name of the official who replied was distinctively Hispanic, 0 if not | `hispanic_official` |
+| `white_pop_third` | The third of the community among the communities of the study on percent non-Hispanic white: 1 lower, 2 middle, 3 top | `white_third` |
+| `black_pop_third` | The same on percent non-Hispanic Black | `black_third` |
+| `hispanic_pop_third` | The same on percent Hispanic | `hispanic_third` |
+| `total_pop_third` | The same on total population | `pop_third` |
+| `poverty_pop_third` | The same on the poverty rate | `poverty_third` |
+| `assesment_third` | The third of the housing authority on the HUD assessment score; the spelling is that of the source | `assessment_third` |
+
+The counts of every column are given in the [codebook of the course file](housing_audit_codebook.md). The community values are thirds because the continuous values of the 2012 American Community Survey would identify the housing authorities. The Stata file labels `HispanicEmailer` "Hard to find email address", a copy error in the source, and the codebook of the OAs labels it "Respondent had Hispanic name".
+
+## The reproduction of Task 3
+
+The value that Multi100 recorded for analyst 8PTRZ, $\chi^2$ = 14.265 on 558 replies, comes from this file: the replies with a greeting code (`Response_Dichotomous` = 1 and `ProperName` not empty), a two-by-two table of the Hispanic names (`TreatmentGroup` starting with `Hispanic`) against all other names by `ProperName`, and `chisq.test()` in R, which applies a continuity correction to a two-by-two table unless it is told otherwise. Without the correction the same table gives 14.95.

@@ -1,0 +1,21 @@
+# Quarto / R working files – safe to ignore, they regenerate.
+/.quarto/
+/_site/
+.Rproj.user
+.Rhistory
+*_cache/
+.DS_Store
+
+# Working notes for the facilitator and the assistant, never published. This
+# repository is public, so the file is ignored here as a mechanical backstop; if
+# one is ever needed in this workspace, it stays untracked.
+CLAUDE.md
+
+# Deliberately NOT ignored:
+#   /_freeze/  – committed so GitHub Actions can publish without re-running R.
+#   /data/     – the CSVs are committed so the report renders offline.
+
+**/*.quarto_ipynb
+
+# The class-chart tag of this copy of the workspace (written by R/spec_tools.R)
+.class-tag
