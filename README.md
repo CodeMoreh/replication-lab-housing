@@ -1,6 +1,6 @@
 # Replication lab – the housing-audit case
 
-## **What is this?**
+## About this workspace
 
 A ready-to-run replication exercise for the course "Applied Replication for Data Skills". You reproduce one of the reanalyses from the Multi100 project, whose results were recently published in *Nature* (Aczel et al. 2026), and test the robustness of a published claim: that emails to public housing authorities signed with Hispanic names were less likely to be answered with a greeting by name than emails signed with white names (Einstein and Glick 2017). You are analyst no. 6, working with the public data of the original study and the choices that the five Multi100 analysts faced.
 
@@ -18,7 +18,7 @@ This workspace is a plain folder, with no version control and no account to sign
 
 3.  **Open the folder in your IDE.** In Positron or VS Code, **File → Open Folder…** and pick the unzipped folder; in RStudio, open `replication-lab-housing.Rproj`, which sits inside it. (Positron is the one that the walkthrough uses on the shared screen; any of the three works for every step.)
 
-4.  **Restore the packages.** This workspace has no lockfile that pins package versions. Instead, `R/check_setup.R` checks what is installed and lists what is missing. In the R console:
+4.  **Check the packages.** This workspace has no lockfile that pins package versions. Instead, `R/check_setup.R` checks what is installed and lists what is missing. In the R console:
 
     ``` r
     source("R/check_setup.R")
@@ -40,7 +40,7 @@ This workspace is a plain folder, with no version control and no account to sign
 
 This folder is kept free of git for the session. There is nothing to commit or push and no account to set up, so everyone in the class can get to the analysis in minutes, whatever their machine.
 
-The workspace *came from* a GitHub repository (`CodeMoreh/replication-lab-housing`), and putting your own work under version control – and publishing the rendered report to a live URL – is the natural take-home step. The course site has a self-study companion module that goes through it click by click: **Git and GitHub self-study** at <https://codemoreh.github.io/applied-replication-housing/companion/git-github.html>. The `.github/` and `.devcontainer/` folders already in this workspace set up that route once the folder is a repository again. You can ignore them for the session.
+The workspace *came from* a GitHub repository (`CodeMoreh/replication-lab-housing`), and putting your own work under version control – and publishing the rendered report to a live URL – is the natural take-home step. The course site has a self-study companion module that goes through it click by click: **Git and GitHub for reproducible research** at <https://codemoreh.github.io/applied-replication-housing/companion/git-github.html>. The `.github/` and `.devcontainer/` folders already in this workspace set up that route once the folder is a repository again. You can ignore them for the session.
 
 ------------------------------------------------------------------------
 

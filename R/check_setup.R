@@ -90,7 +90,15 @@ for (f in data_files) { # r-style: keep – each pass prints one check line
   }
 }
 
-# --- 5. the estimator reproduces the reference specification ----------------
+# --- 5. the report file -----------------------------------------------------
+# index.qmd is what you open and work in.
+if (file.exists("index.qmd")) {
+  ok("index.qmd present – open it to start")
+} else {
+  fail("index.qmd not found – run this from the workspace root folder")
+}
+
+# --- 6. the estimator reproduces the reference specification ----------------
 # The raw difference of the paper: Hispanic against white names, among the
 # replies, without covariates. The live fit must match the row of the curve
 # that is marked as the reference.
@@ -111,14 +119,6 @@ if (length(missing) == 0 && all(file.exists(data_files[c(1, 3)])) && file.exists
   }
 } else {
   skip("the reproduction check needs the packages, R/spec_tools.R and the data files above")
-}
-
-# --- 6. the report file -----------------------------------------------------
-# index.qmd is what you open and work in. Its presence is the last check.
-if (file.exists("index.qmd")) {
-  ok("index.qmd present – open it to start")
-} else {
-  fail("index.qmd not found – run this from the workspace root folder")
 }
 
 # --- verdict ----------------------------------------------------------------

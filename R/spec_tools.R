@@ -141,7 +141,7 @@ check_spec <- function(comparison, population, uncoded, model, adjust) {
 
 # One specification: estimate in percentage points (negative = Hispanic names
 # greeted by name less often, the direction of the claim), its SE, the test of
-# the specification's own model, and the partial correlation by the Multi100 rule.
+# the model that the specification fits, and the partial correlation by the Multi100 rule.
 fit_spec <- function(audit, comparison = "white", population = "replies", uncoded = "drop",
                      model = "lpm", adjust = "none") {
   check_spec(comparison, population, uncoded, model, adjust)
@@ -380,7 +380,7 @@ spec_line <- function(comparison, population, uncoded, model, adjust) {
             res$b_pp, res$ci_low, res$ci_high),
     test,
     sprintf("  n = %d %s, partial r = %.3f (the conversion rule of Multi100)", res$n, unit, res$r),
-    paste0("  Class: ", .class_line(res)),
+    paste0("  Verdict: ", .class_line(res)),
     sprintf("  On the curve: %d of the %d specifications have an estimate further below zero",
             res$further, res$n_curve)))
   invisible(res)
@@ -460,7 +460,7 @@ prereg <- function() {
     unlist(use.names = FALSE)
   ph <- stats::setNames(rows$phrase, rows$axis)
   statement <- c(
-    sprintf("%s%s, %s, %s, the difference in the share of %s between Hispanic names and %s (%s, %s).",
+    sprintf("%s%s, %s, %s, the difference in the share that drew %s between Hispanic names and %s (%s, %s).",
             toupper(substr(ph[["population"]], 1, 1)), substring(ph[["population"]], 2),
             ph[["names"]], ph[["officials"]], ph[["outcome"]], ph[["comparison"]],
             ph[["uncoded"]], ph[["bounced"]]),
@@ -578,7 +578,7 @@ report_result <- function(nickname = NULL) {
             value[["b"]], value[["se"]], res$stat_type, value[["t"]],
             if (nzchar(value[["df"]])) value[["df"]] else "(none, a logit)", res$n, value[["r"]]),
     "  (b and se in percentage points)",
-    paste0("  Class: ", .class_line(res)),
+    paste0("  Verdict: ", .class_line(res)),
     "",
     "Open the link below (or copy the URL) – the form opens with every field",
     "pre-filled; just press Send.",

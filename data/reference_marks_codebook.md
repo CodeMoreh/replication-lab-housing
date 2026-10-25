@@ -16,13 +16,13 @@ The refit of the model of the OAs on the public file (`OA_blinded`) is kept for 
 
 | Column | Meaning |
 |:--|:--|
-| `id` | `OA`, `OA_blinded`, `8PTRZ`, `UYV3F`, `EWFMI`, `25N5D` or `P9W8Y` |
+| `id` | `OA`, `OA_blinded`, `8PTRZ`, `UYV3F`, `EWFMI`, `25N5D`, `P9W8Y` or `SCORE` |
 | `label` | A longer label for the two marks of the OAs and the identifier for the analysts. The chart prints the mark of `OA` as "OAs 2017" |
-| `statistic_type` | `z`, `chi2`, or `LR chi-square (2 df)` for P9W8Y |
+| `statistic_type` | `z`, `chi2`, `LR chi-square (2 df)` for P9W8Y, or `t` for SCORE |
 | `statistic` | The statistic as the paper gives it (`OA`), as the refit gives it (`OA_blinded`), as Multi100 recorded it (four analysts), or as the refit gives it where Multi100 recorded none (P9W8Y). Signs are as recorded: the z of EWFMI is positive because its model takes the Hispanic names as the base, and a $\chi^2$ has no sign |
 | `n` | The emails in the analysis: 549 replies for the model of the OAs, the replies or delivered emails of each refit for the analysts |
 | `b_pp` | The gap in percentage points by which the result is placed; negative values mean that Hispanic names were greeted by name less often |
-| `on_chart` | `TRUE` for the six results drawn on the chart, `FALSE` for `OA_blinded` |
+| `on_chart` | `TRUE` for the six results of the original data and for `SCORE`, `FALSE` for `OA_blinded`; the figures of the original data leave `SCORE` out |
 | `note` | How the mark was placed |
 
 ## The marks

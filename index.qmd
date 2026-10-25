@@ -39,7 +39,7 @@ audit <- read_csv("data/housing_audit.csv", show_col_types = FALSE)
 source("R/spec_tools.R")
 ```
 
-## The claim, and what we are doing to it
+## The claim
 
 In 2014 the original authors (OAs) emailed 1,017 public housing authorities in the United States, asking how to apply for public housing. Each email was signed with one of six names, meant to indicate a white, a Black or a Hispanic sender, and the name that each authority received was assigned at random. The OAs then recorded whether the authority replied, how quickly, and in what tone. One claim from their paper is our target:
 
@@ -57,7 +57,7 @@ Every task is a callout box with instructions, a **TODO** for you to complete, a
 
 ------------------------------------------------------------------------
 
-::: {.callout-note title="Task 1 – Setup and vocabulary"}
+::: {.callout-note title="Task 1 – The setup check and the three Rs"}
 **First, the setup check.** If this report renders at all, your workspace is working: the packages are installed, the data are in place, and the helpers are loaded. Render it once now, before anything else. If it does not render, run `source("R/check_setup.R")` in the console. It names the packages that you are missing and how to install them, and its last check fits the reference specification of the course, which must come out at −19.97 percentage points.
 
 **Then, before touching data, fix the vocabulary.** Three of the four scenarios below describe one of our three Rs (reproducibility, robustness, replicability), while the fourth describes something else entirely.
@@ -77,7 +77,7 @@ Every task is a callout box with instructions, a **TODO** for you to complete, a
 
 ------------------------------------------------------------------------
 
-::: {.callout-note title="Task 2 – The housing-audit data"}
+::: {.callout-note title="Task 2 – The data"}
 The **housing-audit data** (`housing_audit.csv`) hold one row per email. They are already loaded as `audit` in the setup chunk. The file is built from the public file of the OAs on Harvard Dataverse (doi:10.7910/DVN/1HOVTU, released under CC0), with plainer column names; `audit_original.csv`, which Task 3 uses, is that public file with its original names.
 
 **TODO:** run the chunks, then read the figure. Which name received the fewest greetings by name? Note it in a comment.
@@ -131,7 +131,7 @@ The replies to white names greeted the sender by name in 61.1% of cases, those t
 
 ------------------------------------------------------------------------
 
-::: {.callout-note title="Task 2, continued – Estimand and causal graph"}
+::: {.callout-note title="Task 2, continued – The estimand and the graph"}
 Before estimating, say *precisely* what you are estimating. An estimand has two parts: a **unit-specific quantity** and a **target population** (Lundberg et al. 2021). State it outside any model.
 
 **TODO – complete the estimand statement:**
@@ -140,7 +140,7 @@ Before estimating, say *precisely* what you are estimating. An estimand has two 
 
 *(A defensible filling: a reply that greets the sender by name; a white name; the public housing authorities that received an email. The catch is that an authority whose official would not reply to one of the names has no greeting to compare. The comparison can then count every delivered email, a missing reply counting as no greeting, or count the replies only, which compares the authorities that replied to Hispanic names with those that replied to white names. These need not be the same authorities.)*
 
-A causal graph makes that catch visible. `R/dag_starter.R` builds the graph with `make_dag()`, one arrow per line, each written the way it is drawn: `"name -> reply"` is the arrow from the name to the reply. The name decides whether the official replies, and only a reply can greet the sender by name. Something about the official that nobody recorded (workload, habits of courtesy, attitudes) affects both whether they reply and how they greet, and so does the community of the housing authority. One arrow is switched off with a `#`: the arrow from the name to the greeting, which is the effect on tone that the claim is about.
+A causal graph makes that catch visible. `R/dag_starter.R` builds the graph with `make_dag()`, one arrow per line, each written the way it is drawn: `"name -> reply"` is the arrow from the name to the reply. The name can affect whether the official replies, and only a reply can greet the sender by name. Something about the official that nobody recorded (workload, habits of courtesy, attitudes) affects both whether they reply and how they greet, and so does the community of the housing authority. One arrow is switched off with a `#`: the arrow from the name to the greeting, which is the effect on tone that the claim is about.
 
 ```{r}
 #| label: fig-dag
@@ -176,12 +176,12 @@ paths(dag, Z = "reply")
 paths(dag, Z = c("reply", "community"))
 ```
 
-The difference between these two comparisons is the decision on which emails are counted, the first decision of Task 4, and whatever you conclude here becomes field 4 of the preregistration that you write in Task 5.
+The difference between these two comparisons is the decision on which emails are counted, the second argument of `try_spec()` in Task 4, and whatever you conclude here becomes field 4 of the preregistration that you write in Task 5.
 :::
 
 ------------------------------------------------------------------------
 
-::: {.callout-note title="Task 3 – Reproduction"}
+::: {.callout-note title="Task 3 – The reproduction"}
 This is the **reproducibility** check. Analyst 8PTRZ compared Hispanic names with all other names among the 558 replies that carry a greeting code, with a chi-square test of the 2 × 2 table. Multi100 recorded $\chi^2$ = 14.265. Reproduce it from the public file of the OAs, `audit_original.csv`, which keeps their column names: `ProperName` is the greeting by name and `TreatmentGroup` the name group and sex (`"Hispanic male"`, `"white female"` and so on).
 
 ```{r}
@@ -237,7 +237,7 @@ In Task 2 you named the quantity that you are after and drew the graph that show
 ::: {.callout-note title="Task 4 – The menu"}
 This task is **exploratory**. Try several specifications, look at what each one does, and get a feel for which choices move the estimate and which barely touch it. The specification that you submit with `submit_exploration()` at the end of this task appears on the class chart as an open circle, labelled exploratory. The declared one, a filled circle, is fixed later, in the preregistration block of Task 5, before it is run. Both carry the tag that `submit_exploration()` prints, such as `amber-otter-42`, which is kept in the file `.class-tag` of this workspace and lets you find your own marks on the chart. To choose your own, write `submit_exploration(nickname = "...")` with a nickname rather than your name, because the chart is public.
 
-`try_spec()` takes one argument per decision of the specification menu. Every argument defaults to the reference specification, the raw difference of the paper (Hispanic against white names, among the replies, the five uncoded replies left out, a difference in proportions without covariates), so changing one thing means changing one argument. Every call is a live fit on your machine. The first five arguments are the decisions on which the curve of the claim keeps more than one option:
+`try_spec()` takes one argument per decision of the specification menu. Every argument defaults to the reference specification, the raw gap of the paper (Hispanic against white names, among the replies, the five uncoded replies left out, a difference in proportions without covariates), so changing one thing means changing one argument. Every call is a live fit on your machine. The first five arguments are the decisions on which the curve of the claim keeps more than one option:
 
 - `comparison` – white names (`"white"`), or white and Black names together (`"nonhispanic"`);
 - `population` – the replies only (`"replies"`), or every delivered email with no reply counted as no greeting (`"all"`);
@@ -295,7 +295,7 @@ Almost no published paper reports which of its analyses were explored and which 
 
 ------------------------------------------------------------------------
 
-::: {.callout-note title="Task 5 – Preregistration"}
+::: {.callout-note title="Task 5 – The preregistration"}
 A preregistration fixes your specification **before** you know its result, which stops you from quietly picking the one that happens to give the answer you wanted. In a real study it is filed, with a date stamp, in a public registry such as the OSF. In this report the preregistration is the block below, and the code enforces it: the R session keeps the choices that you set in that block, and `run_spec()` and `report_result()` read them from there.
 
 Make one choice on each decision of the menu, complete the dotted lines, then run the block. The five decisions at Level 1 fix the question that you are asking, the two at Level 2 fix how the outcome is measured, and the four at Level 3 fix how it is estimated. The curve of 64 specifications keeps two or more options on five of these decisions and a single option on the other six. An option that is not on the curve stops `prereg()` with the reason why, as it stops `try_spec()`.
@@ -343,7 +343,7 @@ my_scale      <- "pp"        # pp   (percentage points)
 my_spec <- prereg()   # checks every choice, prints your preregistration and keeps it
 ```
 
-An optional mirror form can be used to log preregistrations for the class, and the link to it is shared in the session. It is not required: the block above, rendered into this report, is your preregistration.
+The block above, rendered into this report, is your preregistration.
 
 ------------------------------------------------------------------------
 
@@ -356,7 +356,7 @@ This is the **robustness** check, and it is the part that your classmates cannot
 run_spec(my_spec)
 ```
 
-Read the output like an analyst. The difference is in percentage points, and a value below zero means that replies to Hispanic names greeted the sender by name less often, the direction of the claim. Whether it is significant is decided by the test of the model, and the class line says which of the four cases your result falls in. The last line places it among the 64 specifications of the curve.
+Read the output like an analyst. The difference is in percentage points, and a value below zero means that replies to Hispanic names greeted the sender by name less often, the direction of the claim. Whether it is significant is decided by the test of the model, and the line headed `Class:` says which of the four cases your result falls in. The last line places it among the 64 specifications of the curve.
 
 Now submit it to the class chart. There is nothing to fill in and nothing to transcribe: `report_result()` refits your preregistered specification, builds the spec label, and prints your submission line and a pre-filled form link. Open it and press **Send**. Your mark appears on the live [Multiverse](https://codemoreh.github.io/applied-replication-housing/cases/housing/multiverse.html) chart within seconds, this time as a filled circle labelled **declared**, with the same tag as your exploratory result.
 
@@ -391,14 +391,14 @@ ggplot(spec_curve, aes(x = rank, y = b_pp)) +
        y = "Hispanic minus comparison names (points)")
 ```
 
-All 64 estimates lie below zero, from −20.0 to −12.1 points, and every one of them is significant at 5% under the test of its model. The two clusters are the two answers to the decision on which emails are counted: counting every delivered email moves the estimate about 5 points towards zero, and no other decision moves it by more than about 2.6 points. Within these data the claim holds under every choice on the menu, and only its size moves.
+All 64 estimates lie below zero, from −20.0 to −12.1 points, and every one of them is significant at 5% under the test of its model. The two clusters are the two answers to the decision on which emails are counted: counting every delivered email moves the estimate about 5 points towards zero, and no other decision moves it by more than about 2.7 points. Within these data the claim holds under every choice on the menu, and only its size moves.
 
 **A second declared specification?** Edit the preregistration block, rerun it, then rerun `run_spec(my_spec)`. The mechanics allow it, and the label does not change, so be clear with yourself about what the second one is. Your first preregistration was made without knowing its result. Anything after it was not, which puts it back in the same category as Task 4, and you should say so when you report it.
 
 ------------------------------------------------------------------------
 
 ::: {.callout-note title="Taking it home"}
-You did the whole analysis in a plain folder, with no version control and nothing to sign in to. Putting your own work under version control and publishing the rendered report to a live URL is the natural next step. A self-study module on the course site goes through it click by click: [Git and GitHub self-study](https://codemoreh.github.io/applied-replication-housing/companion/git-github.html). The `.github/` and `.devcontainer/` folders already in this workspace set up that route once the folder is a repository again.
+You did the whole analysis in a plain folder, with no version control and nothing to sign in to. Putting your own work under version control and publishing the rendered report to a live URL is the natural next step. A module of the companion curriculum on the course site goes through it click by click: [Git and GitHub for reproducible research](https://codemoreh.github.io/applied-replication-housing/companion/git-github.html). The `.github/` and `.devcontainer/` folders already in this workspace set up that route once the folder is a repository again.
 :::
 
 ::: {.callout-note title="Going further (optional)"}
@@ -406,7 +406,7 @@ Each of these runs in this workspace if you have time to spare.
 
 - **Sweep a whole decision.** `purrr::walk(c("none", "email", "place", "place_ethnic"), \(a) try_spec(adjust = a))` fits the four adjustment sets in one go, and `my_experiments()` then prints them side by side. The same call works for any decision on which the curve keeps more than one option.
 
-- **The five analysts on the curve.** `data/reference_marks.csv` places the published result and the five Multi100 analyses in percentage points, each from a course refit of the analysis on the public data (`b_pp`). Add them to the figure above as horizontal lines with `geom_hline()`, and find where the analysis of 25N5D, the only one to count every delivered email, falls among the 64.
+- **The five analysts on the curve.** `data/reference_marks.csv` places the published result, by its published change in predicted probability, and the five Multi100 analyses, each by a course refit on the public data, in percentage points (`b_pp`); keep the rows with `on_chart` TRUE other than `SCORE`, which places the replication on new data. Add them to the figure above as horizontal lines with `geom_hline()`, and find where the analysis of 25N5D, the only one to count every delivered email, falls among the 64.
 
 - **A second test.** Every row of `data/spec_curve.csv` also carries `p_ri`, the p-value of a randomisation test that reshuffles the names among the analysed emails 1,999 times. Compare it with `p`, the test of the model. Because the names were assigned at random, the reshuffling reproduces the design of the experiment itself.
 

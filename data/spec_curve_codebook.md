@@ -1,6 +1,6 @@
 # Codebook: `spec_curve.csv`
 
-The curve of the claim of the housing-audit case, "Hispanic housing applicants were ... less likely to be greeted by name than were ... white counterparts", in the wording that SCORE took from the paper of the original authors (OAs): every specification that the specification menu of the course keeps, 64 rows, fitted once on the course file `housing_audit.csv`. The file is written by `R/housing/02_spec_curve.R` with the estimator of `R/housing/_tools.R` (`fit_spec()`), which uses base R and dplyr only, so that the workspace and the browser lab run the identical code; `R/housing/check_parity.R` checks it against `estimatr` (HC2 errors) and `marginaleffects` (average marginal effects) on every row.
+The curve of the claim of the housing-audit case, "Hispanic housing applicants were ... less likely to be greeted by name than were ... white counterparts", in the wording that SCORE took from the paper of the original authors (OAs): every specification that the specification menu of the course keeps, 64 rows, fitted once on the course file `housing_audit.csv`. The file is written by `R/housing/02_spec_curve.R` with the estimator of `R/housing/_tools.R` (`fit_spec()`), which uses base R, dplyr and one function of purrr, so that the workspace and the browser lab run the identical code; `R/housing/check_parity.R` checks it against `estimatr` (HC2 errors) and `marginaleffects` (average marginal effects) on every row.
 
 ## The specifications
 
@@ -18,7 +18,7 @@ The other decisions of the menu take one option on every row: the outcome is the
 
 The analysed rows of a specification are the delivered emails of the groups that it compares, restricted to the replies when `population` is `replies`, without the uncoded replies when `uncoded` is `drop`, and without the emails that lack a covariate of the adjustment set; 14 emails lack the community thirds. The thirds enter as three categories and `hard_email` as a 0/1 indicator.
 
-The reference specification (`is_reference`) is `white`, `replies`, `drop`, `lpm`, `none`, the raw difference of the paper: 41.2% of the replies to Hispanic names against 61.1% of those to white names opened with the name, a gap of −19.97 points, t = −3.87 on 360 df, on 362 replies.
+The reference specification (`is_reference`) is `white`, `replies`, `drop`, `lpm`, `none`, the raw gap of the paper: 41.2% of the replies to Hispanic names against 61.1% of those to white names opened with the name, a gap of −19.97 points, t = −3.87 on 360 df, on 362 replies.
 
 ## Columns
 

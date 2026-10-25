@@ -1,8 +1,8 @@
 ##############################################################################
 # Title:        dag_starter.R – the causal graph of Task 2, to finish
 # Purpose:      The graph behind the claim that emails signed with Hispanic
-#               names were less likely to be greeted by name. The name decides
-#               whether the official replies, and only a reply can greet the
+#               names were less likely to be greeted by name. The name can
+#               affect whether the official replies, and only a reply can greet the
 #               sender by name. A characteristic of the official that nobody
 #               recorded, and the community of the housing authority, affect
 #               both the reply and the greeting. One arrow is left for you to
@@ -54,7 +54,7 @@ make_dag <- function(..., exposure = "name", outcome = "greeting", latent = "off
 
 # ---- The graph -------------------------------------------------------------
 dag <- make_dag(
-  # The name decides whether the official replies at all.
+  # The name can affect whether the official replies at all.
   "name -> reply",
   # Only a reply can greet the sender by name.
   "reply -> greeting",

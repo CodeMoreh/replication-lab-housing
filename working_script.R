@@ -100,7 +100,7 @@ coef(summary(m_uyv3f))
 # submit_exploration() is labelled exploratory on the class chart and carries
 # the tag that the function prints and keeps in .class-tag;
 # submit_exploration(nickname = "...") sets your own (a nickname, not your name).
-try_spec()                                # the raw difference of the paper
+try_spec()                                # the raw gap of the paper
 try_spec(comparison = "nonhispanic")      # Hispanic names against white and Black names together
 try_spec(population = "all")              # every delivered email, no reply counted as no greeting
 try_spec(uncoded    = "not_named")        # the five uncoded replies counted as no greeting
