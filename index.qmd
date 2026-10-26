@@ -21,17 +21,12 @@ knitr:
 #| label: setup
 #| include: false
 
-# Packages used across the report. Run R/check_setup.R first if any are missing
-# on your own laptop – it tells you which, and how to install them.
-library(dplyr)
-library(readr)
-library(ggplot2)
-
-# A calm default look for every figure.
-theme_set(theme_minimal(base_size = 12))
+# Every function is written with the package that it comes from, as in
+# readr::read_csv(). Run R/check_setup.R first if a package is missing on your
+# own laptop – it tells you which, and how to install them.
 
 # The one working object: the housing-audit data, one row per email.
-audit <- read_csv("data/housing_audit.csv", show_col_types = FALSE)
+audit <- readr::read_csv("data/housing_audit.csv", show_col_types = FALSE)
 
 # The helpers of Tasks 4 and 5. Every fit they make is a live fit of the
 # estimator of the course on the housing-audit data, and in Task 5 they read
@@ -86,11 +81,11 @@ The **housing-audit data** (`housing_audit.csv`) hold one row per email. They ar
 #| label: count-emails
 # How many emails, and what came back?
 audit |>
-  summarise(emails    = n(),
-            bounced   = sum(is.na(reply)),
-            delivered = sum(!is.na(reply)),
-            replies   = sum(reply %in% 1),
-            coded     = sum(!is.na(named)))
+  datawizard::data_summary(emails    = n(),
+                           bounced   = sum(is.na(reply)),
+                           delivered = sum(!is.na(reply)),
+                           replies   = sum(reply %in% 1),
+                           coded     = sum(!is.na(named)))
 ```
 
 You should find **1,014 emails** (the paper reports 1,017, three more than the public file holds), of which **23 bounced** and never reached an official, **991 delivered**, **563 replies**, and **558 replies with a greeting code**. The column `reply` is 1 for a reply, 0 for none and missing for a bounced email. `named` is 1 when a reply greeted the sender by name, 0 when it did not, and missing for every email without a reply and for the five replies that carry no greeting code. `group` is the group that the name was meant to indicate, and `name` the name itself.
@@ -99,31 +94,37 @@ You should find **1,014 emails** (the paper reports 1,017, three more than the p
 #| label: by-group
 # Replies and greetings by the group of the name
 audit |>
-  filter(!is.na(reply)) |>
-  summarise(delivered   = n(),
-            replies     = sum(reply == 1),
-            coded       = sum(!is.na(named)),
-            greeted     = sum(named %in% 1),
-            greeted_pct = round(100 * greeted / coded, 1),
-            .by = group)
+  datawizard::data_filter(!is.na(reply)) |>
+  datawizard::data_summary(delivered   = n(),
+                           replies     = sum(reply == 1),
+                           coded       = sum(!is.na(named)),
+                           greeted     = sum(named %in% 1),
+                           greeted_pct = round(100 * sum(named %in% 1) / sum(!is.na(named)), 1),
+                           by = "group")
 ```
 
 ```{r}
 #| label: fig-names
 #| fig-cap: "Replies that greeted the sender by name, by the name that signed the email."
 #| fig-height: 3.6
-audit |>
-  filter(!is.na(named)) |>
-  summarise(greeted_pct = 100 * mean(named), .by = c(group, name)) |>
-  mutate(name = reorder(name, greeted_pct)) |>
-  ggplot(aes(x = greeted_pct, y = name, fill = group)) +
-  geom_col(width = 0.7) +
-  geom_text(aes(label = sprintf("%.1f%%", greeted_pct)), hjust = -0.15, size = 3.5) +
-  scale_fill_manual(values = c(white = "grey60", black = "#4a78ab", hispanic = "#8b1538"),
-                    labels = c(white = "white", black = "Black", hispanic = "Hispanic"),
-                    name = "Names meant to indicate") +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.15))) +
-  labs(x = "Replies that greeted the sender by name (%)", y = NULL)
+# The share greeted by name for each of the six names, from the lowest
+greeted <- audit |>
+  datawizard::data_filter(!is.na(named)) |>
+  datawizard::data_summary(greeted_pct = 100 * mean(named), by = c("group", "name")) |>
+  datawizard::data_arrange("greeted_pct") |>
+  datawizard::data_modify(group = factor(group, levels = c("white", "black", "hispanic"),
+                                         labels = c("white", "Black", "Hispanic")))
+
+tinyplot::tinyplot(greeted_pct ~ name | group, data = greeted,
+                   type = tinyplot::type_barplot(xlevels = greeted$name, width = 0.7, drop.zeros = TRUE), flip = TRUE,
+                   palette = c("grey60", "#4a78ab", "#8b1538"), fill = "by",
+                   legend = list("right!", title = "Names meant to indicate"),
+                   xlab = NA, ylab = "Replies that greeted the sender by name (%)",
+                   ylim = c(0, 72), theme = "minimal")
+# the share at the end of each bar
+tinyplot::tinyplot(x = seq_len(nrow(greeted)), y = greeted$greeted_pct, flip = TRUE,
+                   type = tinyplot::type_text(labels = sprintf("%.1f%%", greeted$greeted_pct), pos = 4),
+                   cex = 0.9, add = TRUE)
 ```
 
 The replies to white names greeted the sender by name in 61.1% of cases, those to Hispanic names in 41.2%: a gap of about 20 points, the size of the published estimate. Black names fall in between, at 56.1%. Every column is described in `data/housing_audit_codebook.md`.
@@ -154,13 +155,13 @@ Two questions can be put to the graph. The first is what has to be adjusted for 
 
 ```{r}
 #| label: adjustment-set
-adjustmentSets(dag)
+dagitty::adjustmentSets(dag)
 ```
 
 ```{r}
 #| label: paths-replies
-paths(dag)
-paths(dag, Z = "reply")
+dagitty::paths(dag)
+dagitty::paths(dag, Z = "reply")
 ```
 
 `adjustmentSets()` returns `{}`, the empty set: nothing has to be adjusted for, because nothing points into the name. The names were assigned at random, so no common cause of the name and the greeting can exist. Conditioning on the reply changes the picture. The path through the reply closes, but two paths open, one through the community and one through the official, because the reply is a common effect of the name and of each of them (a collider), and comparing replies only conditions on it. This is the problem of conditioning on a consequence of the treatment, which Coppock (2019) sets out for audit experiments.
@@ -173,7 +174,7 @@ paths(dag, Z = "reply")
 
 ```{r}
 #| label: paths-adjusted
-paths(dag, Z = c("reply", "community"))
+dagitty::paths(dag, Z = c("reply", "community"))
 ```
 
 The difference between these two comparisons is the decision on which emails are counted, the second argument of `try_spec()` in Task 4, and whatever you conclude here becomes field 4 of the preregistration that you write in Task 5.
@@ -186,11 +187,11 @@ This is the **reproducibility** check. Analyst 8PTRZ compared Hispanic names wit
 
 ```{r}
 #| label: reproduce-8ptrz
-original <- read_csv("data/audit_original.csv", show_col_types = FALSE)
+original <- readr::read_csv("data/audit_original.csv", show_col_types = FALSE)
 
 coded_replies <- original |>
-  filter(!is.na(ProperName)) |>
-  mutate(hispanic_name = grepl("^Hispanic", TreatmentGroup))
+  datawizard::data_filter(!is.na(ProperName)) |>
+  datawizard::data_modify(hispanic_name = grepl("^Hispanic", TreatmentGroup))
 
 nrow(coded_replies)
 
@@ -216,7 +217,7 @@ Without the correction the statistic is 14.95. Neither number changes the conclu
 ```{r}
 #| label: reproduce-uyv3f
 m_uyv3f <- glm(ProperName ~ hispanic_name, family = binomial(),
-               data = filter(coded_replies, !grepl("^black", TreatmentGroup)))
+               data = datawizard::data_filter(coded_replies, !grepl("^black", TreatmentGroup)))
 nobs(m_uyv3f)
 coef(summary(m_uyv3f))
 ```
@@ -372,23 +373,28 @@ Finally, place your result on the curve of the claim: the 64 specifications that
 ```{r}
 #| label: fig-curve
 #| fig-cap: "The curve of 64 specifications, coloured by the emails counted; your declared specification is ringed."
-spec_curve <- read_csv("data/spec_curve.csv", show_col_types = FALSE) |>
-  arrange(b_pp) |>
-  mutate(rank = row_number(),
-         mine = comparison == my_comparison & population == my_population &
-           uncoded == my_uncoded & model == my_model & adjust == my_adjust)
+spec_curve <- readr::read_csv("data/spec_curve.csv", show_col_types = FALSE) |>
+  datawizard::data_arrange("b_pp") |>
+  datawizard::data_modify(rank = 1:n(),
+                          emails = factor(population, levels = c("replies", "all"),
+                                          labels = c("replies only", "all delivered emails")))
+# Yours, chosen with dplyr, because datawizard cannot see the my_ choices of
+# the preregistration chunk
+mine <- spec_curve |>
+  dplyr::filter(comparison == my_comparison, population == my_population, uncoded == my_uncoded,
+                model == my_model, adjust == my_adjust)
 
-ggplot(spec_curve, aes(x = rank, y = b_pp)) +
-  geom_hline(yintercept = 0, colour = "grey60") +
-  geom_point(aes(colour = population), size = 2) +
-  geom_point(data = filter(spec_curve, mine), shape = 21, size = 5, stroke = 1.2,
-             colour = "#8b1538") +
-  scale_colour_manual(values = c(replies = "#0e3b6a", all = "#2b8585"),
-                      breaks = c("replies", "all"),
-                      labels = c(replies = "replies only", all = "all delivered emails"),
-                      name = "Emails counted") +
-  labs(x = "The 64 specifications, from the most negative estimate",
-       y = "Hispanic minus comparison names (points)")
+tinyplot::tinytheme("minimal")
+tinyplot::tinyplot(b_pp ~ rank | emails, data = spec_curve, pch = 16,
+                   palette = c("#0e3b6a", "#2b8585"), legend = list("right!", title = "Emails counted"),
+                   ylim = c(min(spec_curve$b_pp), 0),
+                   xlab = "The 64 specifications, from the most negative estimate",
+                   ylab = "Hispanic minus comparison names (points)")
+tinyplot::tinyplot(b_pp ~ rank, data = spec_curve, type = tinyplot::type_hline(h = 0), col = "grey60", add = TRUE)
+# your specification, ringed; clim keeps a single ring at the size of cex
+tinyplot::tinyplot(b_pp ~ rank, data = mine, type = tinyplot::type_points(clim = c(3, 3)),
+                   pch = 1, cex = 3, lwd = 2.5, col = "#8b1538", add = TRUE)
+tinyplot::tinytheme()
 ```
 
 All 64 estimates lie below zero, from −20.0 to −12.1 points, and every one of them is significant at 5% under the test of its model. The two clusters are the two answers to the decision on which emails are counted: counting every delivered email moves the estimate about 5 points towards zero, and no other decision moves it by more than about 2.7 points. Within these data the claim holds under every choice on the menu, and only its size moves.

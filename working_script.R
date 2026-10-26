@@ -15,7 +15,7 @@
 # Writes:       – (prints results to the console; the submit helpers print a
 #               pre-filled form link)
 # Author:       Chris Moreh
-# Last updated: 2026-10-25
+# Last updated: 2026-10-26
 ##############################################################################
 
 ## ---- Task 1: the setup check ---------------------------------------------
@@ -24,13 +24,10 @@
 # reference specification (-19.97 percentage points).
 source("R/check_setup.R")
 
-library(dplyr)
-library(readr)
-library(ggplot2)
-
-# The one working object, and the helpers that explore, preregister, fit and
-# report a specification.
-audit <- read_csv("data/housing_audit.csv", show_col_types = FALSE)
+# Every function is written with the package that it comes from, as in
+# readr::read_csv(). The one working object, and the helpers that explore,
+# preregister, fit and report a specification.
+audit <- readr::read_csv("data/housing_audit.csv", show_col_types = FALSE)
 source("R/spec_tools.R")
 
 ## ---- Task 2: the emails, the estimand and the graph ----------------------
@@ -39,22 +36,22 @@ source("R/spec_tools.R")
 # bounced email, and named is recorded for replies only (five replies carry no
 # greeting code).
 audit |>
-  summarise(emails    = n(),
-            bounced   = sum(is.na(reply)),
-            delivered = sum(!is.na(reply)),
-            replies   = sum(reply %in% 1),
-            coded     = sum(!is.na(named)))
+  datawizard::data_summary(emails    = n(),
+                           bounced   = sum(is.na(reply)),
+                           delivered = sum(!is.na(reply)),
+                           replies   = sum(reply %in% 1),
+                           coded     = sum(!is.na(named)))
 
 # By group of names: the replies, and the greetings by name among the coded
 # replies.
 audit |>
-  filter(!is.na(reply)) |>
-  summarise(delivered   = n(),
-            replies     = sum(reply == 1),
-            coded       = sum(!is.na(named)),
-            greeted     = sum(named %in% 1),
-            greeted_pct = round(100 * greeted / coded, 1),
-            .by = group)
+  datawizard::data_filter(!is.na(reply)) |>
+  datawizard::data_summary(delivered   = n(),
+                           replies     = sum(reply == 1),
+                           coded       = sum(!is.na(named)),
+                           greeted     = sum(named %in% 1),
+                           greeted_pct = round(100 * sum(named %in% 1) / sum(!is.na(named)), 1),
+                           by = "group")
 
 # The causal graph. Open R/dag_starter.R, take the # off the arrow
 # "name -> greeting" if you believe it, and source the file again.
@@ -62,24 +59,24 @@ source("R/dag_starter.R")
 plot_dag(dag)
 
 # What has to be adjusted for, if the comparison counts every delivered email?
-adjustmentSets(dag)
+dagitty::adjustmentSets(dag)
 
 # Which paths from the name to the greeting are open, and which open up once
 # the comparison is made among replies only?
-paths(dag)
-paths(dag, Z = "reply")
-paths(dag, Z = c("reply", "community"))
+dagitty::paths(dag)
+dagitty::paths(dag, Z = "reply")
+dagitty::paths(dag, Z = c("reply", "community"))
 
 ## ---- Task 3: reproduce the recorded result -------------------------------
 
 # The value that Multi100 recorded for analyst 8PTRZ, from the public file of
 # the original authors. Type your X-squared into the chat and send it on the
 # facilitator's word.
-original <- read_csv("data/audit_original.csv", show_col_types = FALSE)
+original <- readr::read_csv("data/audit_original.csv", show_col_types = FALSE)
 
 coded_replies <- original |>
-  filter(!is.na(ProperName)) |>
-  mutate(hispanic_name = grepl("^Hispanic", TreatmentGroup))
+  datawizard::data_filter(!is.na(ProperName)) |>
+  datawizard::data_modify(hispanic_name = grepl("^Hispanic", TreatmentGroup))
 
 tab_8ptrz <- xtabs(~ hispanic_name + ProperName, data = coded_replies)
 tab_8ptrz
@@ -88,7 +85,7 @@ chisq.test(tab_8ptrz, correct = FALSE)   # X-squared = 14.952, without it
 
 # Optional: the logit of analyst UYV3F, z = -3.771 on 362 replies.
 m_uyv3f <- glm(ProperName ~ hispanic_name, family = binomial(),
-               data = filter(coded_replies, !grepl("^black", TreatmentGroup)))
+               data = datawizard::data_filter(coded_replies, !grepl("^black", TreatmentGroup)))
 coef(summary(m_uyv3f))
 
 ## ---- Task 4: work the menu ------------------------------------------------
@@ -153,21 +150,25 @@ run_spec(my_spec)
 report_result()
 
 # Your result among the 64 specifications of the curve.
-spec_curve <- read_csv("data/spec_curve.csv", show_col_types = FALSE) |>
-  arrange(b_pp) |>
-  mutate(rank = row_number(),
-         mine = comparison == my_comparison & population == my_population &
-           uncoded == my_uncoded & model == my_model & adjust == my_adjust)
+spec_curve <- readr::read_csv("data/spec_curve.csv", show_col_types = FALSE) |>
+  datawizard::data_arrange("b_pp") |>
+  datawizard::data_modify(rank = 1:n(),
+                          emails = factor(population, levels = c("replies", "all"),
+                                          labels = c("replies only", "all delivered emails")))
+# Yours, chosen with dplyr, because datawizard cannot see the my_ choices of
+# the preregistration above
+mine <- spec_curve |>
+  dplyr::filter(comparison == my_comparison, population == my_population, uncoded == my_uncoded,
+                model == my_model, adjust == my_adjust)
 
-ggplot(spec_curve, aes(x = rank, y = b_pp)) +
-  geom_hline(yintercept = 0, colour = "grey60") +
-  geom_point(aes(colour = population), size = 2) +
-  geom_point(data = filter(spec_curve, mine), shape = 21, size = 5, stroke = 1.2,
-             colour = "#8b1538") +
-  scale_colour_manual(values = c(replies = "#0e3b6a", all = "#2b8585"),
-                      breaks = c("replies", "all"),
-                      labels = c(replies = "replies only", all = "all delivered emails"),
-                      name = "Emails counted") +
-  labs(x = "The 64 specifications, from the most negative estimate",
-       y = "Hispanic minus comparison names (points)") +
-  theme_minimal()
+tinyplot::tinytheme("minimal")
+tinyplot::tinyplot(b_pp ~ rank | emails, data = spec_curve, pch = 16,
+                   palette = c("#0e3b6a", "#2b8585"), legend = list("right!", title = "Emails counted"),
+                   ylim = c(min(spec_curve$b_pp), 0),
+                   xlab = "The 64 specifications, from the most negative estimate",
+                   ylab = "Hispanic minus comparison names (points)")
+tinyplot::tinyplot(b_pp ~ rank, data = spec_curve, type = tinyplot::type_hline(h = 0), col = "grey60", add = TRUE)
+# your specification, ringed; clim keeps a single ring at the size of cex
+tinyplot::tinyplot(b_pp ~ rank, data = mine, type = tinyplot::type_points(clim = c(3, 3)),
+                   pch = 1, cex = 3, lwd = 2.5, col = "#8b1538", add = TRUE)
+tinyplot::tinytheme()

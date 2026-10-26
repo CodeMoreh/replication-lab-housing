@@ -24,7 +24,7 @@ This workspace is a plain folder, with no version control and no account to sign
     source("R/check_setup.R")
     ```
 
-    It prints an `[OK]` / `[FAIL]` line per check (R version, Quarto, the six required packages, the data files, and a fit of the reference specification, which must come out at −19.97 percentage points). If any packages are missing, it prints the one line that installs them. Run that line, then re-run the check.
+    It prints an `[OK]` / `[FAIL]` line per check (R version, Quarto, the twelve required packages, the data files, and a fit of the reference specification, which must come out at −19.97 percentage points). If any packages are missing, it prints the one line that installs them. Run that line, then re-run the check. The figures are drawn with tinyplot (McDermott, Arel-Bundock and Zeileis; CRAN, doi:10.32614/CRAN.package.tinyplot), and every function in the code is written with the package that it comes from, as in `readr::read_csv()`.
 
 5.  **Open the report and preview it.** Open `index.qmd`, then in a terminal inside your IDE:
 

@@ -13,21 +13,18 @@
 #               authors, Harvard Dataverse doi:10.7910/DVN/1HOVTU, CC0)
 # Writes:       – (prints the tests)
 # Author:       Chris Moreh
-# Last updated: 2026-10-25
+# Last updated: 2026-10-26
 ##############################################################################
 
-library(dplyr)
-library(readr)
-
-original <- read_csv("data/audit_original.csv", show_col_types = FALSE)
+original <- readr::read_csv("data/audit_original.csv", show_col_types = FALSE)
 
 # ProperName is 1 when the reply greeted the sender by name, 0 when it did
 # not, and missing for the emails without a reply, the bounced emails and the
 # five replies that carry no greeting code. TreatmentGroup reads "Hispanic
 # male", "white female" and so on.
 coded_replies <- original |>
-  filter(!is.na(ProperName)) |>
-  mutate(hispanic_name = grepl("^Hispanic", TreatmentGroup))
+  datawizard::data_filter(!is.na(ProperName)) |>
+  datawizard::data_modify(hispanic_name = grepl("^Hispanic", TreatmentGroup))
 
 nrow(coded_replies)   # 558
 
@@ -46,7 +43,7 @@ chisq.test(tab_8ptrz, correct = FALSE)
 # A logit of the greeting on a Hispanic name, among the replies to Hispanic and
 # white names only, with no covariates: z = -3.771 on 362 replies.
 replies_uyv3f <- coded_replies |>
-  filter(!grepl("^black", TreatmentGroup))
+  datawizard::data_filter(!grepl("^black", TreatmentGroup))
 
 m_uyv3f <- glm(ProperName ~ hispanic_name, family = binomial(), data = replies_uyv3f)
 nobs(m_uyv3f)   # 362

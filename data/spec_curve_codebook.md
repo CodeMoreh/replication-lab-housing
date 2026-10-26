@@ -27,7 +27,7 @@ The reference specification (`is_reference`) is `white`, `replies`, `drop`, `lpm
 | `spec_id` | The row number, 1 to 64, in the order of `expand_grid()` over the five decisions |
 | `comparison`, `population`, `uncoded`, `model`, `adjust` | The options of the specification, as above. These are the arguments of `fit_spec()` and of `try_spec()` in the exercise |
 | `b_pp` | The estimate in percentage points: 100 times the coefficient of the Hispanic names for the linear model, and 100 times the average marginal effect for the logit, the difference in the predicted probability of a named greeting between a Hispanic and a comparison name, averaged over the analysed emails. Negative values mean that Hispanic names were greeted by name less often, the direction of the claim |
-| `se_pp` | The standard error of `b_pp` in points: the HC2 error for the linear model, and for the logit the delta-method error of the average marginal effect, from a numerical gradient |
+| `se_pp` | The standard error of `b_pp` in points: the HC2 error for the linear model, from parameters with sandwich, and for the logit the delta-method error of the average marginal effect, from marginaleffects |
 | `coef`, `coef_se` | The coefficient of the Hispanic names on the scale of the model (a proportion for the linear model, a log odds for the logit) and its standard error (HC2 for the linear model, the usual model-based error for the logit) |
 | `stat_type` | `t` for the linear model, `z` for the logit |
 | `stat` | `coef` divided by `coef_se` |
@@ -37,7 +37,7 @@ The reference specification (`is_reference`) is `white`, `replies`, `drop`, `lpm
 | `n` | The emails analysed |
 | `n_hisp`, `n_comp` | The analysed emails with Hispanic names and with comparison names |
 | `rate_hisp`, `rate_comp` | The share of the analysed emails in each group whose outcome is 1, in per cent, before any adjustment |
-| `p_ri` | The p-value of a randomisation test, kept as a check: the names are reshuffled among the analysed emails and the model refitted 1,999 times, each specification with its own seed (20261025 plus `spec_id`), and p = (1 + the number of reshuffles whose coefficient is at least as large in absolute value as the observed one) / 2,000. The smallest possible value is therefore 0.0005 |
+| `p_ri` | The p-value of a randomisation test, kept as a check: the names are reshuffled 1,999 times among the analysed emails by complete random assignment, as many Hispanic names as the design gave them, and the model is refitted after each reshuffle (ri2), each specification with its own seed (20261025 plus `spec_id`); p = (1 + the number of reshuffles whose coefficient is at least as large in absolute value as the observed one) / 2,000, the permutation p-value of `statmod::permp()` for reshuffles drawn at random. The smallest possible value is therefore 0.0005 |
 | `supports` | `b_pp` < 0 |
 | `sig` | `p` < 0.05 |
 | `is_reference` | TRUE for the reference specification only |

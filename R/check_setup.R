@@ -8,7 +8,7 @@
 #               and changes nothing on your system. Base R up to the last
 #               check, because it has to run before any package is installed.
 # Author:       Chris Moreh
-# Last updated: 2026-10-25
+# Last updated: 2026-10-26
 # Sourced by:   the participant, before the session (source("R/check_setup.R"))
 ##############################################################################
 
@@ -53,11 +53,15 @@ if (nzchar(qv) && !grepl("not found|error", qv, ignore.case = TRUE)) {
 }
 
 # --- 3. packages ------------------------------------------------------------
-# The estimator needs dplyr and purrr beside base R; the report reads with
-# readr, draws with ggplot2 and asks dagitty about the causal graph. Quarto
-# runs the R chunks of the report through rmarkdown, so a fresh R
+# The estimator fits with parameters (and sandwich for the HC2 errors),
+# marginaleffects and effectsize, and chooses its rows with dplyr, tibble and
+# datawizard, iterating with purrr; the report reads with readr, draws with
+# tinyplot (McDermott, Arel-Bundock and Zeileis; CRAN,
+# doi:10.32614/CRAN.package.tinyplot) and asks dagitty about the causal graph.
+# Quarto runs the R chunks of the report through rmarkdown, so a fresh R
 # installation without it renders nothing.
-needed <- c("dplyr", "purrr", "readr", "ggplot2", "dagitty", "rmarkdown")
+needed <- c("dplyr", "purrr", "readr", "tibble", "datawizard", "parameters", "sandwich",
+            "marginaleffects", "effectsize", "tinyplot", "dagitty", "rmarkdown")
 missing <- needed[!vapply(needed, requireNamespace, logical(1), quietly = TRUE)] # r-style: keep – purrr may not be installed yet
 if (length(missing) == 0) {
   ok(paste0("all ", length(needed), " required packages installed"))

@@ -2,8 +2,8 @@ id,label,statistic_type,statistic,n,b_pp,on_chart,note
 OA,"Original authors, Table 1, model 3 (published)",z,-3.727272727272727,549,-20,TRUE,"Logit coefficient -0.82 (SE 0.22) with continuous 2012 ACS covariates; the change in predicted probability at the means is -20.0 points, 95% CI -30.5 to -10.0."
 OA_blinded,Original authors' model refitted on the public file,z,-3.4701723182394044,549,-18.39408599101208,FALSE,"The covariates are the thirds that the public file holds in place of the continuous values, so the refit approximates the published model by design."
 8PTRZ,8PTRZ,chi2,14.265,558,-17.31409544950058,TRUE,"Placed by the course refit of the analysis, which reproduces the recorded statistic."
-UYV3F,UYV3F,z,-3.771,362,-19.96638655462194,TRUE,"Placed by the course refit of the analysis, which reproduces the recorded statistic."
+UYV3F,UYV3F,z,-3.771,362,-19.966386554621938,TRUE,"Placed by the course refit of the analysis, which reproduces the recorded statistic."
 EWFMI,EWFMI,z,3.645,549,-19.38944780814264,TRUE,"Placed by the course refit of the analysis, which reproduces the recorded statistic."
 25N5D,25N5D,chi2,13.683,665,-13.17163228927927,TRUE,"Placed by the course refit of the analysis, which reproduces the recorded statistic."
 P9W8Y,P9W8Y,LR chi-square (2 df),15.951461714467428,558,-19.966386554621916,TRUE,No statistic recorded by Multi100; placed by the course refit of the analysis.
-SCORE,"SCORE replication (new audit, 2020)",t,9.804594744877687e-4,1484,0.002544885416679516,TRUE,"New data: 3,050 authorities emailed by four male aliases, two Hispanic and two white. Placed by the raw gap among all replies, computed by the course from the de-identified data on the OSF (osf.io/xseqg)."
+SCORE,"SCORE replication (new audit, 2020)",t,9.804594744877652e-4,1484,0.002544885416679516,TRUE,"New data: 3,050 authorities emailed by four male aliases, two Hispanic and two white. Placed by the raw gap among all replies, computed by the course from the de-identified data on the OSF (osf.io/xseqg)."

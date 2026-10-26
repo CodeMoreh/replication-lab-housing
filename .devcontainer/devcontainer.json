@@ -6,7 +6,7 @@
       "version": "1.9.36"
     }
   },
-  "postCreateCommand": "Rscript -e \"install.packages('pak', repos='https://packagemanager.posit.co/cran/__linux__/jammy/latest'); pak::pak(c('dplyr','purrr','readr','ggplot2','dagitty','rmarkdown'))\"",
+  "postCreateCommand": "Rscript -e \"install.packages('pak', repos='https://packagemanager.posit.co/cran/__linux__/jammy/latest'); pak::pak(c('dplyr','purrr','readr','tibble','datawizard','parameters','sandwich','marginaleffects','effectsize','tinyplot','dagitty','rmarkdown'))\"",
   "customizations": {
     "vscode": {
       "extensions": [

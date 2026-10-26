@@ -50,7 +50,7 @@ jobs:
         with:
           # No DESCRIPTION file in this template, so list the packages explicitly.
           packages: >
-            dplyr, purrr, readr, ggplot2, dagitty, rmarkdown
+            dplyr, purrr, readr, tibble, datawizard, parameters, sandwich, marginaleffects, effectsize, tinyplot, dagitty, rmarkdown
 
       - name: Render the Quarto site
         uses: quarto-dev/quarto-actions/render@v2

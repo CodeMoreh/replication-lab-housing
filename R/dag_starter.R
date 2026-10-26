@@ -9,7 +9,7 @@
 #               switch on. Then ask dagitty which paths from the name to the
 #               greeting stay open when the comparison is made among replies.
 # Author:       Chris Moreh
-# Last updated: 2026-10-25
+# Last updated: 2026-10-26
 # Sourced by:   index.qmd and working_script.R (Task 2)
 ##############################################################################
 
@@ -24,9 +24,6 @@
 #                as well, because the name and the official both affect it.
 #                Comparing replies only conditions on it, and conditioning on a
 #                collider opens a path between its causes.
-
-library(dagitty)
-library(ggplot2)
 
 # Where each node sits in the figure: the name on the left, the greeting on
 # the right, the reply above the line between them. dagitty counts y
@@ -49,7 +46,7 @@ make_dag <- function(..., exposure = "name", outcome = "greeting", latent = "off
                 sprintf("pos=\"%s,%s\"", .dag_xy[[v]][1], -.dag_xy[[v]][2]))
     if (length(tags) == 0) v else sprintf("%s [%s]", v, paste(tags, collapse = ","))
   })
-  dagitty(paste0("dag {\n", paste(c(declare, arrows), collapse = "\n"), "\n}"))
+  dagitty::dagitty(paste0("dag {\n", paste(c(declare, arrows), collapse = "\n"), "\n}"))
 }
 
 # ---- The graph -------------------------------------------------------------
@@ -78,25 +75,27 @@ dag <- make_dag(
 
 # ---- The figure ------------------------------------------------------------
 # Colour marks the exposure and the outcome, and the official, whom nobody
-# observed, is drawn pale. Each arrow stops at the edge of the box of its
-# target, which is sized from the length of the name. Returns a ggplot object.
+# observed, is drawn pale. Each arrow stops near the edge of the box of its
+# target, which is sized from the length of the name. Drawn with tinyplot
+# (McDermott, Arel-Bundock and Zeileis; CRAN, doi:10.32614/CRAN.package.tinyplot).
 plot_dag <- function(d = dag) {
-  xy <- coordinates(d)
-  nodes <- data.frame(name = names(xy$x), x = unname(xy$x), y = -unname(xy$y)) |>
+  xy <- dagitty::coordinates(d)
+  nodes <- tibble::tibble(name = names(xy$x), x = unname(xy$x), y = -unname(xy$y)) |>
     dplyr::mutate(
       unplaced = is.na(.data$x),
       x = dplyr::if_else(.data$unplaced, 1.2 * (cumsum(.data$unplaced) - 1), .data$x),
       y = dplyr::if_else(.data$unplaced, -0.9, .data$y),
       half_w = 0.06 + 0.032 * nchar(.data$name),
-      role = dplyr::case_when(.data$name %in% exposures(d) ~ "exposure",
-                              .data$name %in% outcomes(d) ~ "outcome",
-                              .data$name %in% latents(d) ~ "unobserved",
-                              .default = "observed"))
+      role = factor(dplyr::case_when(.data$name %in% dagitty::exposures(d) ~ "exposure",
+                                     .data$name %in% dagitty::outcomes(d) ~ "outcome",
+                                     .data$name %in% dagitty::latents(d) ~ "unobserved",
+                                     .default = "observed"),
+                    levels = c("exposure", "outcome", "observed", "unobserved")))
   # how far along a unit vector (ux, uy) the edge of a box of half-width w lies
   to_edge <- \(ux, uy, w) pmin(w / pmax(abs(ux), 1e-9), 0.15 / pmax(abs(uy), 1e-9))
   tails <- dplyr::select(nodes, from = "name", x0 = "x", y0 = "y", w0 = "half_w")
   heads <- dplyr::select(nodes, to = "name", x1 = "x", y1 = "y", w1 = "half_w")
-  arrows <- edges(d) |>
+  arrows <- dagitty::edges(d) |>
     dplyr::transmute(from = as.character(.data$v), to = as.character(.data$w)) |>
     dplyr::inner_join(tails, by = "from") |>
     dplyr::inner_join(heads, by = "to") |>
@@ -108,23 +107,19 @@ plot_dag <- function(d = dag) {
                   x = .data$x0 + .data$s0 * .data$ux, y = .data$y0 + .data$s0 * .data$uy,
                   xend = .data$x1 - .data$s1 * .data$ux, yend = .data$y1 - .data$s1 * .data$uy)
 
-  ggplot() +
-    geom_segment(data = arrows, aes(x = x, y = y, xend = xend, yend = yend),
-                 colour = "grey40", linewidth = 0.6,
-                 arrow = grid::arrow(length = grid::unit(7, "pt"), type = "closed")) +
-    geom_label(data = nodes, aes(x = x, y = y, label = name, fill = role, colour = role),
-               fontface = "bold", size = 3.6, linewidth = 0,
-               label.r = grid::unit(4, "pt"), label.padding = grid::unit(5, "pt")) +
-    scale_fill_manual(values = c(exposure = "#1b6ca8", outcome = "#d1495b",
-                                 observed = "grey45", unobserved = "grey88"),
-                      breaks = c("exposure", "outcome", "observed", "unobserved"), name = NULL) +
-    scale_colour_manual(values = c(exposure = "white", outcome = "white",
-                                   observed = "white", unobserved = "grey25"),
-                        guide = "none") +
-    # Without the override, the legend keys show the letter "a" that geom_label draws.
-    guides(fill = guide_legend(override.aes = list(label = ""))) +
-    scale_x_continuous(expand = expansion(add = 0.45)) +
-    scale_y_continuous(expand = expansion(add = 0.3)) +
-    theme_void() +
-    theme(legend.position = "bottom")
+  # the boxes, coloured by role; tinyplot has no type for arrows, so they go
+  # on the same canvas through graphics::arrows(); then the names, white on
+  # the coloured boxes and dark on the pale one
+  tinyplot::tinyplot(xmin = nodes$x - 0.8 * nodes$half_w, xmax = nodes$x + 0.8 * nodes$half_w,
+                     ymin = nodes$y - 0.1, ymax = nodes$y + 0.1, by = nodes$role, type = "rect",
+                     palette = c("#1b6ca8", "#d1495b", "grey45", "grey88"), fill = "by",
+                     legend = list("bottom!", title = NULL), axes = FALSE, frame.plot = FALSE,
+                     xlab = NA, ylab = NA,
+                     xlim = range(nodes$x) + c(-0.45, 0.45), ylim = range(nodes$y) + c(-0.3, 0.3),
+                     grid = FALSE, theme = "minimal")
+  graphics::arrows(arrows$x, arrows$y, arrows$xend, arrows$yend,
+                   length = 0.1, angle = 20, col = "grey40", lwd = 1.5)
+  tinyplot::tinyplot(x = nodes$x, y = nodes$y, by = nodes$role,
+                     type = tinyplot::type_text(labels = nodes$name, font = 2),
+                     palette = c("white", "white", "white", "grey25"), cex = 0.85, add = TRUE)
 }
