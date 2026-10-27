@@ -23,6 +23,16 @@ The public file of the original authors (OAs) of "Does Race Affect Access to Gov
 
 The counts of every column are given in the [codebook of the course file](housing_audit_codebook.md). The community values are thirds because the continuous values of the 2012 American Community Survey would identify the housing authorities. The Stata file labels `HispanicEmailer` "Hard to find email address", a copy error in the source, and the codebook of the OAs labels it "Respondent had Hispanic name".
 
-## The reproduction of Task 3
+## The reproductions of Task 3
 
-The value that Multi100 recorded for analyst 8PTRZ, $\chi^2$ = 14.265 on 558 replies, comes from this file: the replies with a greeting code (`Response_Dichotomous` = 1 and `ProperName` not empty), a two-by-two table of the Hispanic names (`TreatmentGroup` starting with `Hispanic`) against all other names by `ProperName`, and `chisq.test()` in R, which applies a continuity correction to a two-by-two table unless it is told otherwise. Without the correction the same table gives 14.95.
+The five Multi100 reanalyses of the claim are reproduced from this file, and the four statistics that Multi100 recorded come out exactly.
+
+| Analyst | Rows | Test | Recorded |
+|:--|:--|:--|:--|
+| 8PTRZ | the 558 replies with a greeting code (`ProperName` not empty), the Hispanic names (`TreatmentGroup` starting with `Hispanic`) against all other names | `chisq.test()` of the two-by-two table by `ProperName`, with the continuity correction that R applies to such a table unless it is told otherwise (14.95 without it) | $\chi^2$ = 14.265 |
+| UYV3F | the 362 coded replies to Hispanic and white names | logistic regression of `ProperName` on the Hispanic names, without covariates | z = −3.771 |
+| EWFMI | the 549 coded replies that carry `poverty_pop_third` | logistic regression of `ProperName` on the three groups with the Hispanic names as the base group, the sex of the name, `poverty_pop_third` entered as a number and `HardEmail` | z = 3.645 |
+| 25N5D | the 665 delivered emails to Hispanic and white names (`Response_Dichotomous` not empty), a missing reply counted as no greeting | `prop.test()` on the greetings by name and the emails of each group, with its default continuity correction (14.33 without it) | $\chi^2$ = 13.683 |
+| P9W8Y | the 558 coded replies | likelihood-ratio test of a logistic regression of `ProperName` on the three groups against a model without them | none recorded; the test gives $\chi^2$ = 15.951 on 2 df |
+
+The group and the sex of the name are the two words of `TreatmentGroup`. The code of each reproduction is in Task 3 of the browser lab and of the downloadable workspace.

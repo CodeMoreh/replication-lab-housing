@@ -182,51 +182,135 @@ The difference between these two comparisons is the decision on which emails are
 
 ------------------------------------------------------------------------
 
-::: {.callout-note title="Task 3 – The reproduction"}
-This is the **reproducibility** check. Analyst 8PTRZ compared Hispanic names with all other names among the 558 replies that carry a greeting code, with a chi-square test of the 2 × 2 table. Multi100 recorded $\chi^2$ = 14.265. Reproduce it from the public file of the OAs, `audit_original.csv`, which keeps their column names: `ProperName` is the greeting by name and `TreatmentGroup` the name group and sex (`"Hispanic male"`, `"white female"` and so on).
+::::: {.callout-note title="Task 3 – The reproduction"}
+This is the **reproducibility** check. Five analysts reanalysed the claim for Multi100, each with code of their own, and Multi100 recorded a test statistic for four of them. **Choose one of the five** and reproduce the analysis from the public file of the OAs, `audit_original.csv`, which keeps their column names. `Response_Dichotomous` is 1 for a reply, 0 for none and empty for a bounced email. `ProperName` is the greeting by name, empty for every email that has no reply with a greeting code. `TreatmentGroup` holds the group and the sex of the name (`"Hispanic male"`, `"white female"` and so on).
+
+| Analyst | What the analysis compared | Emails counted | Test | Recorded by Multi100 |
+|:--|:--|:--|:--|:--|
+| 8PTRZ | Hispanic names against all other names | the 558 replies with a greeting code | chi-square test of a 2 × 2 table | $\chi^2$ = 14.265 |
+| UYV3F | Hispanic against white names | the 362 coded replies to those names | logistic regression without covariates | z = −3.771 |
+| EWFMI | the three groups, with Hispanic names as the base | the 549 coded replies that carry a poverty third | logistic regression with the sex of the name, the poverty third and the hard-to-find address | z = 3.645 |
+| 25N5D | Hispanic against white names | the 665 delivered emails to those names, a missing reply counted as no greeting | two-proportion test | $\chi^2$ = 13.683 |
+| P9W8Y | the three groups | the 558 replies with a greeting code | likelihood-ratio test of a logistic regression | none |
+
+Each tab below holds the code of one analyst. The report runs all five, so that you can compare them, but work through the one that you chose line by line. When you have your value, type the analyst and the value into the chat, for example `UYV3F z = -3.771`, hold it, and send it on the facilitator's word. The four recorded statistics all come out exactly. For P9W8Y Multi100 recorded no statistic, so its analysis can be run again but there is nothing on record to match it against.
+
+```{r}
+#| label: reproduce-read
+original <- readr::read_csv("data/audit_original.csv", show_col_types = FALSE)
+```
+
+::: {.panel-tabset}
+
+### 8PTRZ
+
+Hispanic names against all other names, white and Black together, among the 558 replies that carry a greeting code, with a chi-square test of the 2 × 2 table.
 
 ```{r}
 #| label: reproduce-8ptrz
-original <- readr::read_csv("data/audit_original.csv", show_col_types = FALSE)
-
 coded_replies <- original |>
   datawizard::data_filter(!is.na(ProperName)) |>
   datawizard::data_modify(hispanic_name = grepl("^Hispanic", TreatmentGroup))
 
-nrow(coded_replies)
-
-tab_8ptrz <- xtabs(~ hispanic_name + ProperName, data = coded_replies)
+tab_8ptrz <- xtabs(~ hispanic_name + ProperName, data = coded_replies)  # r-style: keep – the table that chisq.test() takes
 tab_8ptrz
 
 chisq.test(tab_8ptrz)
 ```
 
-The test gives **X-squared = 14.265** on 1 df, the value on record for analyst 8PTRZ, reproduced from the public data. Type your $\chi^2$ into the chat, hold it, and send it on the facilitator's word.
+The test gives **X-squared = 14.265** on 1 df, the value on record for 8PTRZ.
 
-Now find out why it is 14.265. For a 2 × 2 table, `chisq.test()` applies the continuity correction of Yates unless it is told otherwise: it shrinks each gap between an observed and an expected count by 0.5 before squaring, a remedy designed for small tables. The analyst did not choose it; the default of the function did.
+### UYV3F
+
+Hispanic against white names only, among the 362 coded replies to those names, with a logistic regression of the greeting on the name and no covariates.
+
+```{r}
+#| label: reproduce-uyv3f
+replies_uyv3f <- original |>
+  datawizard::data_filter(!is.na(ProperName) & !grepl("^black", TreatmentGroup)) |>
+  datawizard::data_modify(hispanic_name = grepl("^Hispanic", TreatmentGroup))
+
+m_uyv3f <- glm(ProperName ~ hispanic_name, family = binomial(), data = replies_uyv3f)
+nobs(m_uyv3f)
+print(parameters::model_parameters(m_uyv3f, ci_method = "wald"), digits = 3)
+```
+
+The row of the Hispanic names gives **z = −3.771** on 362 replies, the value on record for UYV3F.
+
+### EWFMI
+
+A logistic regression of the greeting on all three groups of names, with the Hispanic names as the base group, the sex of the name, the poverty third of the community entered as a number, and the hard-to-find address, as the analyst fitted it in Stata. The 9 coded replies from communities without a poverty third drop out.
+
+```{r}
+#| label: reproduce-ewfmi
+replies_ewfmi <- original |>
+  datawizard::data_filter(!is.na(ProperName)) |>
+  datawizard::data_separate(select = "TreatmentGroup", new_columns = c("ethnicity", "name_sex"),
+                            separator = " ", append = TRUE) |>
+  datawizard::data_modify(ethnicity = factor(ethnicity, levels = c("Hispanic", "black", "white")))
+
+m_ewfmi <- glm(ProperName ~ ethnicity + name_sex + poverty_pop_third + HardEmail,
+               family = binomial(), data = replies_ewfmi)
+nobs(m_ewfmi)
+print(parameters::model_parameters(m_ewfmi, ci_method = "wald"), digits = 3)
+```
+
+The row `ethnicity [white]` gives **z = 3.645** on 549 replies, the value on record for EWFMI. It is positive because the coefficient compares white names with the Hispanic names of the base group.
+
+### 25N5D
+
+Hispanic against white names among every delivered email, an email without a reply counted as one without a greeting, with the two-proportion test of R. The five replies without a greeting code stay in the denominators.
+
+```{r}
+#| label: reproduce-25n5d
+counts_25n5d <- original |>
+  datawizard::data_filter(!is.na(Response_Dichotomous) & !grepl("^black", TreatmentGroup)) |>
+  datawizard::data_modify(hispanic_name = grepl("^Hispanic", TreatmentGroup),
+                          greeted = Response_Dichotomous == 1 & ProperName %in% 1) |>
+  datawizard::data_summary(greetings = sum(greeted), emails = n(), by = "hispanic_name")
+counts_25n5d
+
+prop.test(counts_25n5d$greetings, counts_25n5d$emails)
+```
+
+The test gives **X-squared = 13.683** on 1 df for 665 emails, the value on record for 25N5D.
+
+### P9W8Y
+
+A logistic regression of the greeting on the three groups of names among the 558 coded replies, and a likelihood-ratio test of whether the three groups differ at all.
+
+```{r}
+#| label: reproduce-p9w8y
+replies_p9w8y <- original |>
+  datawizard::data_filter(!is.na(ProperName)) |>
+  datawizard::data_separate(select = "TreatmentGroup", new_columns = c("ethnicity", "name_sex"),
+                            separator = " ", append = TRUE) |>
+  datawizard::data_modify(ethnicity = factor(ethnicity, levels = c("white", "black", "Hispanic")))
+
+m_p9w8y <- glm(ProperName ~ ethnicity, family = binomial(), data = replies_p9w8y)
+nobs(m_p9w8y)
+anova(update(m_p9w8y, . ~ 1), m_p9w8y, test = "LRT")
+```
+
+The column `Deviance` gives 15.951 on 2 degrees of freedom. Multi100 recorded no statistic for this analysis, so there is nothing on record to match it against; the report that the analyst filed for Task 2 gives the same value in its text.
+
+:::
+
+Now find out why your number is exactly that number. For a 2 × 2 table, `chisq.test()` and `prop.test()` both apply the continuity correction of Yates unless they are told otherwise: it shrinks each gap between an observed and an expected count by 0.5 before squaring, a remedy designed for small tables. Neither 8PTRZ nor 25N5D asked for the correction. The defaults of the two functions applied it, and the recorded values are the corrected ones.
 
 ```{r}
 #| label: reproduce-uncorrected
 chisq.test(tab_8ptrz, correct = FALSE)
+prop.test(counts_25n5d$greetings, counts_25n5d$emails, correct = FALSE)
 ```
 
-Without the correction the statistic is 14.95. Neither number changes the conclusion, but only one of them matches the record, and the description "a chi-square test" fits both. A reproduction needs the code, or at least every default that the code relied on.
+Without the correction the statistics are 14.95 and 14.33. Neither changes the conclusion, but only the corrected values match the record, and the description "a chi-square test" fits both. The coding matters in the same way. The z of EWFMI is positive and that of UYV3F negative, although both describe Hispanic names greeted by name less often. A reproduction needs the code, or at least every default and every coding on which the code relied.
 
-*Optional extension.* Analyst UYV3F compared Hispanic with white names only, among their 362 coded replies, with a logistic regression and no covariates. Multi100 recorded z = −3.771:
-
-```{r}
-#| label: reproduce-uyv3f
-m_uyv3f <- glm(ProperName ~ hispanic_name, family = binomial(),
-               data = datawizard::data_filter(coded_replies, !grepl("^black", TreatmentGroup)))
-nobs(m_uyv3f)
-coef(summary(m_uyv3f))
-```
-
-The same steps are in `prep/reproduce_8PTRZ.R` as a script. The scripts that the analysts submitted are on the OSF, in the Multi100 component of the paper (osf.io/38rsh); that of 8PTRZ is at osf.io/j8wvh.
-:::
+The same steps are in `prep/reproduce_reanalyses.R` as a script. The scripts that the analysts submitted are on the OSF, in the Multi100 component of the paper (osf.io/38rsh), one sub-component for each analyst.
+:::::
 
 ::: {.callout-note collapse="true" title="Reproduction and the five analysts"}
-You reproduced the recorded value exactly, and so did everyone else in the class, because everyone ran the same code on the same file. That is why reproducibility is the cheapest of the three Rs to establish.
+You reproduced the value of the analyst whom you chose, and so did everyone else who chose the same analyst, because everyone ran the same code on the same file. That is why reproducibility is the cheapest of the three Rs to establish.
 
 The five Multi100 analysts each wrote their own code for this claim. Three concluded that the results were evidence for the claim and two that they were evidence neither for nor against it, although the four statistics that Multi100 recorded all come from gaps in the same direction. Part of the difference lies in the questions that each analyst chose to answer (which names to compare, which emails to count), and part in what each analyst took to count as evidence: one of the two who answered 'neither' found the gap but judged it substantially smaller than the published one. The [case study](https://codemoreh.github.io/applied-replication/cases/housing/index.html) on the course site sets out what each analyst chose.
 

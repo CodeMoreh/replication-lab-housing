@@ -51,7 +51,7 @@ The tasks in `index.qmd` map to the learning objectives of the day:
 - **The three Rs.** Distinguish reproducibility, robustness and replicability, and say why the distinction matters. *(Task 1)*
 - **Meet the data.** Count the 1,014 emails, the replies and the greetings by name, by the name that signed each email. *(Task 2)*
 - **State the estimand and encode it in a causal graph.** Write the target quantity, then finish the graph with `dagitty` and ask which paths open when the comparison is made among replies only. *(Task 2, continued)*
-- **Reproduce the recorded result.** From the public file of the original authors, reproduce **$\chi^2$ = 14.265**, the value recorded for analyst 8PTRZ in the Multi100 dataset, and find out why it is not 14.95. *(Task 3)*
+- **Reproduce a recorded result.** Choose one of the five Multi100 analysts and reproduce their analysis from the public file of the original authors: four of them have a value in the Multi100 dataset, such as **$\chi^2$ = 14.265** for 8PTRZ, and each of the four comes out exactly. Then find out on which defaults of the software the value depends. `prep/reproduce_reanalyses.R` holds all five as a script. *(Task 3)*
 - **Work the specification menu.** Fit alternative specifications with `try_spec()`, compare them, and submit the one you would defend to the class chart with `submit_exploration()`, where it is labelled exploratory. *(Task 4)*
 - **Preregister, then fit.** Complete the preregistration block, then fit it with `run_spec()` and place it among the 64 specifications of the curve. *(Task 5)*
 - **Locate yourself in the multiverse.** Submit your result with `report_result()` and find your marks among the others on the class chart by the tag that both submission functions print. *(Task 5, continued)*
@@ -65,7 +65,7 @@ The tasks in `index.qmd` map to the learning objectives of the day:
 - **Submit your results:** `submit_exploration()` in Task 4 and `report_result()` in Task 5 each print a link to a pre-filled Google Form; open it and press **Send**, and the result appears on the live multiverse chart at https://codemoreh.github.io/applied-replication/cases/housing/multiverse.html
 - **Take-home git/GitHub path:** https://codemoreh.github.io/applied-replication/companion/git-github.html
 - **The data:** the replication package of the original study on Harvard Dataverse, https://doi.org/10.7910/DVN/1HOVTU (CC0).
-- **The five Multi100 analyses:** the Multi100 component of the paper on the OSF, https://osf.io/38rsh/, with one sub-component per analyst (8PTRZ at https://osf.io/j8wvh/).
+- **The five Multi100 analyses:** the Multi100 component of the paper on the OSF, https://osf.io/38rsh/, with one sub-component per analyst: 8PTRZ https://osf.io/j8wvh/, UYV3F https://osf.io/3672s/ (a review document only), EWFMI https://osf.io/jhvca/, 25N5D https://osf.io/v8zah/ and P9W8Y https://osf.io/pzwbm/.
 
 ------------------------------------------------------------------------
 
@@ -76,7 +76,7 @@ This workspace is published as the "Use this template" repository `CodeMoreh/rep
 - `.devcontainer/devcontainer.json` – a Codespaces / dev-container image (R + Quarto + the package list) so the repository can be opened and rendered in the cloud with no local install.
 - `.github/workflows/publish.yml` – renders the report and publishes it to GitHub Pages on every push, once **Settings → Pages → Source** is set to **"GitHub Actions"**. It installs R and re-runs the chunks, so the edits of a participant show up.
 
-Neither is needed for the zip route used in class. Keep `data/` in step with the `cases/housing/data/` folder of the course repository. `housing_audit.csv` is what the report and the helpers read, and `audit_original.csv` is the public file of the original authors, on which Task 3 runs. `spec_curve.csv` is the curve of 64 specifications, against which `R/spec_tools.R` checks and places every live fit, and `menu_options.csv` gives the reason for every option that is not on the curve. `analysts5.csv` and `reference_marks.csv` record the five Multi100 analyses and the reference marks of the curve. The codebooks beside them describe every column. The estimator in `R/spec_tools.R` is a verbatim copy of `R/housing/_tools.R` in the course repository, which builds the curve; the configuration block at the top of that file holds the ID and entry codes of the results Form.
+Neither is needed for the zip route used in class. Keep `data/` in step with the `cases/housing/data/` folder of the course repository. `housing_audit.csv` is what the report and the helpers read, and `audit_original.csv` is the public file of the original authors, on which the five reproductions of Task 3 run. `spec_curve.csv` is the curve of 64 specifications, against which `R/spec_tools.R` checks and places every live fit, and `menu_options.csv` gives the reason for every option that is not on the curve. `analysts5.csv` and `reference_marks.csv` record the five Multi100 analyses and the reference marks of the curve. The codebooks beside them describe every column. The estimator in `R/spec_tools.R` is a verbatim copy of `R/housing/_tools.R` in the course repository, which builds the curve; the configuration block at the top of that file holds the ID and entry codes of the results Form.
 
 ------------------------------------------------------------------------
 

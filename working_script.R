@@ -2,10 +2,10 @@
 # Title:        Working script – the housing-audit exercise, plain R
 # Purpose:      Tasks 1 to 5 of index.qmd, as a script you can step through in
 #               the console: check the setup, look at the emails and draw the
-#               causal graph, reproduce the value that Multi100 recorded for
-#               analyst 8PTRZ (chi-square = 14.265), explore the specification
-#               menu, then preregister one specification and fit and report
-#               it. Every fit is live and takes a moment.
+#               causal graph, reproduce one of the five Multi100 reanalyses
+#               (the four with a recorded statistic come out exactly), explore
+#               the specification menu, then preregister one specification and
+#               fit and report it. Every fit is live and takes a moment.
 # Reads:        data/housing_audit.csv (the 1,014 emails of the course file);
 #               data/audit_original.csv (the public file of the original
 #               authors); through R/spec_tools.R, data/spec_curve.csv (the
@@ -15,7 +15,7 @@
 # Writes:       – (prints results to the console; the submit helpers print a
 #               pre-filled form link)
 # Author:       Chris Moreh
-# Last updated: 2026-10-26
+# Last updated: 2026-10-27
 ##############################################################################
 
 ## ---- Task 1: the setup check ---------------------------------------------
@@ -67,26 +67,71 @@ dagitty::paths(dag)
 dagitty::paths(dag, Z = "reply")
 dagitty::paths(dag, Z = c("reply", "community"))
 
-## ---- Task 3: reproduce the recorded result -------------------------------
+## ---- Task 3: reproduce one of the five reanalyses ------------------------
 
-# The value that Multi100 recorded for analyst 8PTRZ, from the public file of
-# the original authors. Type your X-squared into the chat and send it on the
+# Choose one of the five analysts and run their section. Each reproduces the
+# analysis from the public file of the original authors, with the value that
+# Multi100 recorded beside it. When you have your value, type the analyst and
+# the value into the chat, for example "UYV3F z = -3.771", and send it on the
 # facilitator's word.
 original <- readr::read_csv("data/audit_original.csv", show_col_types = FALSE)
 
+# 8PTRZ: Hispanic against all other names among the 558 replies with a
+# greeting code, a chi-square test of the 2 x 2 table. Recorded: 14.265.
 coded_replies <- original |>
   datawizard::data_filter(!is.na(ProperName)) |>
   datawizard::data_modify(hispanic_name = grepl("^Hispanic", TreatmentGroup))
-
-tab_8ptrz <- xtabs(~ hispanic_name + ProperName, data = coded_replies)
+tab_8ptrz <- xtabs(~ hispanic_name + ProperName, data = coded_replies)  # r-style: keep – the table that chisq.test() takes
 tab_8ptrz
 chisq.test(tab_8ptrz)                    # X-squared = 14.265, with the continuity correction
 chisq.test(tab_8ptrz, correct = FALSE)   # X-squared = 14.952, without it
 
-# Optional: the logit of analyst UYV3F, z = -3.771 on 362 replies.
-m_uyv3f <- glm(ProperName ~ hispanic_name, family = binomial(),
-               data = datawizard::data_filter(coded_replies, !grepl("^black", TreatmentGroup)))
-coef(summary(m_uyv3f))
+# UYV3F: Hispanic against white names among their 362 coded replies, a
+# logistic regression without covariates. Recorded: z = -3.771.
+replies_uyv3f <- original |>
+  datawizard::data_filter(!is.na(ProperName) & !grepl("^black", TreatmentGroup)) |>
+  datawizard::data_modify(hispanic_name = grepl("^Hispanic", TreatmentGroup))
+m_uyv3f <- glm(ProperName ~ hispanic_name, family = binomial(), data = replies_uyv3f)
+nobs(m_uyv3f)
+print(parameters::model_parameters(m_uyv3f, ci_method = "wald"), digits = 3)
+
+# EWFMI: the three groups with the Hispanic names as the base group, the sex
+# of the name, the poverty third as a number and the hard-to-find address;
+# the 9 coded replies without a poverty third drop out. Recorded: z = 3.645,
+# the row of the white names, positive because the base is Hispanic.
+replies_ewfmi <- original |>
+  datawizard::data_filter(!is.na(ProperName)) |>
+  datawizard::data_separate(select = "TreatmentGroup", new_columns = c("ethnicity", "name_sex"),
+                            separator = " ", append = TRUE) |>
+  datawizard::data_modify(ethnicity = factor(ethnicity, levels = c("Hispanic", "black", "white")))
+m_ewfmi <- glm(ProperName ~ ethnicity + name_sex + poverty_pop_third + HardEmail,
+               family = binomial(), data = replies_ewfmi)
+nobs(m_ewfmi)
+print(parameters::model_parameters(m_ewfmi, ci_method = "wald"), digits = 3)
+
+# 25N5D: Hispanic against white names among the 665 delivered emails, no
+# reply counted as no greeting and the five uncoded replies left in the
+# denominators, a two-proportion test. Recorded: 13.683.
+counts_25n5d <- original |>
+  datawizard::data_filter(!is.na(Response_Dichotomous) & !grepl("^black", TreatmentGroup)) |>
+  datawizard::data_modify(hispanic_name = grepl("^Hispanic", TreatmentGroup),
+                          greeted = Response_Dichotomous == 1 & ProperName %in% 1) |>
+  datawizard::data_summary(greetings = sum(greeted), emails = n(), by = "hispanic_name")
+counts_25n5d
+prop.test(counts_25n5d$greetings, counts_25n5d$emails)                   # X-squared = 13.683
+prop.test(counts_25n5d$greetings, counts_25n5d$emails, correct = FALSE)  # X-squared = 14.334
+
+# P9W8Y: the three groups among the 558 coded replies, a likelihood-ratio
+# test of the groups. Multi100 recorded no statistic, so there is nothing to
+# match; the report of the analyst gives chi-square = 15.951 on 2 df.
+replies_p9w8y <- original |>
+  datawizard::data_filter(!is.na(ProperName)) |>
+  datawizard::data_separate(select = "TreatmentGroup", new_columns = c("ethnicity", "name_sex"),
+                            separator = " ", append = TRUE) |>
+  datawizard::data_modify(ethnicity = factor(ethnicity, levels = c("white", "black", "Hispanic")))
+m_p9w8y <- glm(ProperName ~ ethnicity, family = binomial(), data = replies_p9w8y)
+nobs(m_p9w8y)
+anova(update(m_p9w8y, . ~ 1), m_p9w8y, test = "LRT")
 
 ## ---- Task 4: work the menu ------------------------------------------------
 
