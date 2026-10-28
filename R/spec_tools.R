@@ -40,7 +40,7 @@
                  t = "entry.1940779437", df = "entry.1682711955", n = "entry.1586392724",
                  r = "entry.1660273001")
 .case_word <- "housing"
-.course_url <- "https://codemoreh.github.io/applied-replication"
+.course_url <- "https://codemoreh.github.io/ar4ds-housing"
 # ============================================================================
 
 

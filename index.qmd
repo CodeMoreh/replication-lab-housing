@@ -312,7 +312,7 @@ The same steps are in `prep/reproduce_reanalyses.R` as a script. The scripts tha
 ::: {.callout-note collapse="true" title="Reproduction and the five analysts"}
 You reproduced the value of the analyst whom you chose, and so did everyone else who chose the same analyst, because everyone ran the same code on the same file. That is why reproducibility is the cheapest of the three Rs to establish.
 
-The five Multi100 analysts each wrote their own code for this claim. Three concluded that the results were evidence for the claim and two that they were evidence neither for nor against it, although the four statistics that Multi100 recorded all come from gaps in the same direction. Part of the difference lies in the questions that each analyst chose to answer (which names to compare, which emails to count), and part in what each analyst took to count as evidence: one of the two who answered 'neither' found the gap but judged it substantially smaller than the published one. The [case study](https://codemoreh.github.io/applied-replication/cases/housing/index.html) on the course site sets out what each analyst chose.
+The five Multi100 analysts each wrote their own code for this claim. Three concluded that the results were evidence for the claim and two that they were evidence neither for nor against it, although the four statistics that Multi100 recorded all come from gaps in the same direction. Part of the difference lies in the questions that each analyst chose to answer (which names to compare, which emails to count), and part in what each analyst took to count as evidence: one of the two who answered 'neither' found the gap but judged it substantially smaller than the published one. The [case study](https://codemoreh.github.io/ar4ds-housing/cases/housing/index.html) on the course site sets out what each analyst chose.
 
 In Task 2 you named the quantity that you are after and drew the graph that shows what each comparison conditions on. In Task 4 you will find out how far the answer moves when the choices change.
 :::
@@ -443,7 +443,7 @@ run_spec(my_spec)
 
 Read the output like an analyst. The difference is in percentage points, and a value below zero means that replies to Hispanic names greeted the sender by name less often, the direction of the claim. Whether it is significant is decided by the test of the model, and the line headed `Class:` says which of the four cases your result falls in. The last line places it among the 64 specifications of the curve.
 
-Now submit it to the class chart. There is nothing to fill in and nothing to transcribe: `report_result()` refits your preregistered specification, builds the spec label, and prints your submission line and a pre-filled form link. Open it and press **Send**. Your mark appears on the live [Multiverse](https://codemoreh.github.io/applied-replication/cases/housing/multiverse.html) chart within seconds, this time as a filled circle labelled **declared**, with the same tag as your exploratory result.
+Now submit it to the class chart. There is nothing to fill in and nothing to transcribe: `report_result()` refits your preregistered specification, builds the spec label, and prints your submission line and a pre-filled form link. Open it and press **Send**. Your mark appears on the live [Multiverse](https://codemoreh.github.io/ar4ds-housing/cases/housing/multiverse.html) chart within seconds, this time as a filled circle labelled **declared**, with the same tag as your exploratory result.
 
 ```{r}
 #| label: report
@@ -488,7 +488,7 @@ All 64 estimates lie below zero, from −20.0 to −12.1 points, and every one o
 ------------------------------------------------------------------------
 
 ::: {.callout-note title="Taking it home"}
-You did the whole analysis in a plain folder, with no version control and nothing to sign in to. Putting your own work under version control and publishing the rendered report to a live URL is the natural next step. A module of the companion curriculum on the course site goes through it click by click: [Git and GitHub for reproducible research](https://codemoreh.github.io/applied-replication/companion/git-github.html). The `.github/` and `.devcontainer/` folders already in this workspace set up that route once the folder is a repository again.
+You did the whole analysis in a plain folder, with no version control and nothing to sign in to. Putting your own work under version control and publishing the rendered report to a live URL is the natural next step. A module of the companion curriculum on the course site goes through it click by click: [Git and GitHub for reproducible research](https://codemoreh.github.io/ar4ds/git-github.html). The `.github/` and `.devcontainer/` folders already in this workspace set up that route once the folder is a repository again.
 :::
 
 ::: {.callout-note title="Going further (optional)"}

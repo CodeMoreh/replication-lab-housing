@@ -40,7 +40,7 @@ This workspace is a plain folder, with no version control and no account to sign
 
 This folder is kept free of git for the session. There is nothing to commit or push and no account to set up, so everyone in the class can get to the analysis in minutes, whatever their machine.
 
-The workspace *came from* a GitHub repository (`CodeMoreh/replication-lab-housing`), and putting your own work under version control – and publishing the rendered report to a live URL – is the natural take-home step. The course site has a self-study companion module that goes through it click by click: **Git and GitHub for reproducible research** at <https://codemoreh.github.io/applied-replication/companion/git-github.html>. The `.github/` and `.devcontainer/` folders already in this workspace set up that route once the folder is a repository again. You can ignore them for the session.
+The workspace *came from* a GitHub repository (`CodeMoreh/replication-lab-housing`), and putting your own work under version control – and publishing the rendered report to a live URL – is the natural take-home step. The course site has a self-study companion module that goes through it click by click: **Git and GitHub for reproducible research** at <https://codemoreh.github.io/ar4ds/git-github.html>. The `.github/` and `.devcontainer/` folders already in this workspace set up that route once the folder is a repository again. You can ignore them for the session.
 
 ------------------------------------------------------------------------
 
@@ -61,9 +61,9 @@ The tasks in `index.qmd` map to the learning objectives of the day:
 
 ## Links
 
-- **Course site:** https://codemoreh.github.io/applied-replication/
-- **Submit your results:** `submit_exploration()` in Task 4 and `report_result()` in Task 5 each print a link to a pre-filled Google Form; open it and press **Send**, and the result appears on the live multiverse chart at https://codemoreh.github.io/applied-replication/cases/housing/multiverse.html
-- **Take-home git/GitHub path:** https://codemoreh.github.io/applied-replication/companion/git-github.html
+- **Course site:** https://codemoreh.github.io/ar4ds-housing/
+- **Submit your results:** `submit_exploration()` in Task 4 and `report_result()` in Task 5 each print a link to a pre-filled Google Form; open it and press **Send**, and the result appears on the live multiverse chart at https://codemoreh.github.io/ar4ds-housing/cases/housing/multiverse.html
+- **Take-home git/GitHub path:** https://codemoreh.github.io/ar4ds/git-github.html
 - **The data:** the replication package of the original study on Harvard Dataverse, https://doi.org/10.7910/DVN/1HOVTU (CC0).
 - **The five Multi100 analyses:** the Multi100 component of the paper on the OSF, https://osf.io/38rsh/, with one sub-component per analyst: 8PTRZ https://osf.io/j8wvh/, UYV3F https://osf.io/3672s/ (a review document only), EWFMI https://osf.io/jhvca/, 25N5D https://osf.io/v8zah/ and P9W8Y https://osf.io/pzwbm/.
 
