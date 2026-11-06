@@ -383,7 +383,7 @@ Almost no published paper reports which of its analyses were explored and which 
 ::: {.callout-note title="Task 5 – The preregistration"}
 A preregistration fixes your specification **before** you know its result, which stops you from quietly picking the one that happens to give the answer you wanted. In a real study it is filed, with a date stamp, in a public registry such as the OSF. In this report the preregistration is the block below, and the code enforces it: the R session keeps the choices that you set in that block, and `run_spec()` and `report_result()` read them from there.
 
-Make one choice on each decision of the menu, complete the dotted lines, then run the block. The five decisions at Level 1 fix the question that you are asking, the two at Level 2 fix how the outcome is measured, and the four at Level 3 fix how it is estimated. The curve of 64 specifications keeps two or more options on five of these decisions and a single option on the other six. An option that is not on the curve stops `prereg()` with the reason why, as it stops `try_spec()`.
+Make one choice on each decision of the menu, complete the dotted lines, then run the block. The five decisions about the question fix what you are asking, the two measurement decisions fix how the outcome is counted, and the four decisions about the model fix how the answer is reached. The curve of 64 specifications keeps two or more options on five of these decisions and a single option on the other six. An option that is not on the curve stops `prereg()` with the reason why, as it stops `try_spec()`.
 :::
 
 ::: {.callout-important title="How this block maps to a real preregistration"}
@@ -402,18 +402,18 @@ Make one choice on each decision of the menu, complete the dotted lines, then ru
 # 3. My one specification – one choice on each decision. An option that is
 #    not on the curve of 64 stops prereg() with the reason why.
 
-# Level 1 – Estimands (each of these changes what is being estimated)
+# The question (each of these changes what is being estimated)
 my_outcome    <- "named"     # named   (greeted by name, the outcome of the claim)
 my_comparison <- "white"     # white | nonhispanic   (white names, or white and Black names)
 my_population <- "replies"   # replies | all   (replies only, or every delivered email)
 my_names      <- "both"      # both   (male and female names pooled)
 my_officials  <- "any"       # any    (replies from every official)
 
-# Level 2 – Measurement (the same question, put to the data differently)
+# Measurement (the same question, put to the data differently)
 my_uncoded    <- "drop"      # drop | not_named   (the five replies without a greeting code)
 my_bounced    <- "exclude"   # exclude   (the 23 emails that never arrived)
 
-# Level 3 – Estimation (the same question and measures, another fit)
+# The model (the same question and measures, another fit)
 my_model      <- "lpm"       # lpm | logit   (difference in proportions, or logistic regression)
 my_adjust     <- "none"      # none | email | place | place_ethnic
 my_inference  <- "model"     # model   (HC2 t test, or the z test of the logit)

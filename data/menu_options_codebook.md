@@ -2,14 +2,14 @@
 
 `menu_options.csv` lists every option of the specification menu of the housing-audit case, one row per option, 33 rows over 11 decisions. For each option it records whether it is on the curve of the claim, the 64 specifications of `spec_curve.csv` ([codebook](spec_curve_codebook.md)), which page of the course teaches it, and the reasoning on whether it answers the claim under test, "Hispanic housing applicants were ... less likely to be greeted by name than were ... white counterparts", in the wording that SCORE took from the paper of the original authors (OAs). The file is written by hand, not by a script. It follows the schema of the menu file of the EU-frames case, with one judgement added, `unavailable`, for an option that the public file cannot support.
 
-Three parts of the course read it. The decision map (`cases/housing/map.qmd`) builds its stages, its selectable options, the estimand statement and the description of each option from it. The specification menu (`cases/housing/menu.qmd`) builds its tables of the three levels from it. And the helpers of the browser lab and of the workspace read `axis`, `option`, `on_curve`, `taught_on` and `reason` to explain why an option off the curve is refused, so those five columns and the codes in them must not change without a matching change in the helpers.
+Three parts of the course read it. The decision map (`cases/housing/map.qmd`) builds its stages, its selectable options, the estimand statement and the description of each option from it. The specification menu (`cases/housing/menu.qmd`) builds its tables of the three groups of decisions from it. And the helpers of the browser lab and of the workspace read `axis`, `option`, `on_curve`, `taught_on` and `reason` to explain why an option off the curve is refused, so those five columns and the codes in them must not change without a matching change in the helpers.
 
 ## Columns
 
 | Column | Meaning |
 |:--|:--|
-| `axis` | The decision, as a code: `outcome`, `comparison`, `population`, `names`, `officials` (Level 1); `uncoded`, `bounced` (Level 2); `model`, `adjust`, `inference`, `scale` (Level 3). The five decisions that vary on the curve, `comparison`, `population`, `uncoded`, `model` and `adjust`, carry the codes of the columns of `spec_curve.csv` and of the arguments of `try_spec()` |
-| `level` | `estimand`, `measurement` or `estimation`, the level of the menu at which the decision sits |
+| `axis` | The decision, as a code: `outcome`, `comparison`, `population`, `names` and `officials`, the decisions about the question; `uncoded` and `bounced`, the measurement decisions; `model`, `adjust`, `inference` and `scale`, the decisions about the model. The five decisions that vary on the curve, `comparison`, `population`, `uncoded`, `model` and `adjust`, carry the codes of the columns of `spec_curve.csv` and of the arguments of `try_spec()` |
+| `level` | The group of the menu to which the decision belongs, as a code: `estimand` for the group headed "The question", `measurement` for "Measurement" and `estimation` for "The model" |
 | `option` | The option code, as the curve, the deviation file and the helpers write it |
 | `label` | A short label for the option, used on the decision map, in the tables of the menu and in messages |
 | `on_curve` | `TRUE` for an option that the curve of 64 keeps (18 rows), `FALSE` for one that the course teaches off the curve (15 rows) |
@@ -24,7 +24,7 @@ Three parts of the course read it. The decision map (`cases/housing/map.qmd`) bu
 
 ## The phrases of the estimand statement
 
-The decision map assembles the statement from the `phrase` column in a fixed order: "[Emails counted], [names], [who replied], the difference in the share that drew [outcome] between Hispanic names and [comparison group] ([replies without a greeting code], [bounced emails])." The phrases of the emails counted begin with "among", which the page capitalises. A second sentence carries the Level 3 decisions: "Estimated with [model], [adjustment], tested by [test] and reported [effect scale]." One option rewrites more than its own phrase: the comparison of Black with white names (`comparison` = `black`) replaces "Hispanic names and [comparison group]" with "Black names and white names", because it compares a different pair of groups.
+The decision map assembles the statement from the `phrase` column in a fixed order: "[Emails counted], [names], [who replied], the difference in the share that drew [outcome] between Hispanic names and [comparison group] ([replies without a greeting code], [bounced emails])." The phrases of the emails counted begin with "among", which the page capitalises. A second sentence carries the decisions about the model: "Estimated with [model], [adjustment], tested by [test] and reported [effect scale]." One option rewrites more than its own phrase: the comparison of Black with white names (`comparison` = `black`) replaces "Hispanic names and [comparison group]" with "Black names and white names", because it compares a different pair of groups.
 
 ## Options with numbers elsewhere
 

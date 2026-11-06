@@ -167,18 +167,18 @@ submit_exploration()
 # One choice on each decision. An option that is not on the curve stops
 # prereg() with the reason why.
 
-# Level 1 – Estimands (each of these changes what is being estimated)
+# The question (each of these changes what is being estimated)
 my_outcome    <- "named"     # named   (greeted by name, the outcome of the claim)
 my_comparison <- "white"     # white | nonhispanic   (white names, or white and Black names)
 my_population <- "replies"   # replies | all   (replies only, or every delivered email)
 my_names      <- "both"      # both   (male and female names pooled)
 my_officials  <- "any"       # any    (replies from every official)
 
-# Level 2 – Measurement (the same question, put to the data differently)
+# Measurement (the same question, put to the data differently)
 my_uncoded    <- "drop"      # drop | not_named   (the five replies without a greeting code)
 my_bounced    <- "exclude"   # exclude   (the 23 emails that never arrived)
 
-# Level 3 – Estimation (the same question and measures, another fit)
+# The model (the same question and measures, another fit)
 my_model      <- "lpm"       # lpm | logit   (difference in proportions, or logistic regression)
 my_adjust     <- "none"      # none | email | place | place_ethnic
 my_inference  <- "model"     # model   (HC2 t test, or the z test of the logit)

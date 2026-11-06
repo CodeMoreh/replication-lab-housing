@@ -180,24 +180,24 @@ spec_line <- function(comparison, population, uncoded, model, adjust) {
 # Every other option is a row of data/menu_options.csv, whose reason the
 # helpers print when it is asked for.
 .menu <- list(
-  # Level 1 – Estimands
+  # The question
   outcome    = "named",
   comparison = SPEC_AXES$comparison,
   population = SPEC_AXES$population,
   names      = "both",
   officials  = "any",
-  # Level 2 – Measurement
+  # Measurement
   uncoded    = SPEC_AXES$uncoded,
   bounced    = "exclude",
-  # Level 3 – Estimation
+  # The model
   model      = SPEC_AXES$model,
   adjust     = SPEC_AXES$adjust,
   inference  = "model",
   scale      = "pp"
 )
-.level_titles <- c(estimand    = "Level 1 – Estimands",
-                   measurement = "Level 2 – Measurement",
-                   estimation  = "Level 3 – Estimation")
+.level_titles <- c(estimand    = "The question",
+                   measurement = "Measurement",
+                   estimation  = "The model")
 
 
 # ---- The shipped files -----------------------------------------------------------
