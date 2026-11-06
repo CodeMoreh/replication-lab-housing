@@ -462,7 +462,7 @@ run_spec <- function(spec) {
     stop("Pass the object that prereg() returned: my_spec <- prereg(), then run_spec(my_spec).",
          call. = FALSE)
   if (!identical(spec$choices, .check_choices()))
-    stop("The preregistration block has changed since prereg() returned this object. Run the whole block again, then run_spec(my_spec).",
+    stop("Your choices have changed since prereg() returned this object. Run your choices and my_spec <- prereg() again, then run_spec(my_spec).",
          call. = FALSE)
   .print_result(spec$choices, .result(spec$choices), "Your preregistered specification, fitted live:")
 }
